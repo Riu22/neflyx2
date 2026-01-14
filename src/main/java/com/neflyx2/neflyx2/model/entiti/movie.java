@@ -9,6 +9,7 @@ import java.util.List;
 
 @Entity
 public class movie {
+    // utilizar anotacion embeded id para las compuestas
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer movie_id;
