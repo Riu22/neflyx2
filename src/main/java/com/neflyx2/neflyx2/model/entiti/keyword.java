@@ -14,4 +14,28 @@ public class keyword {
 
     @ManyToMany(mappedBy = "keywords")
     List<movie> movies;
+
+    public Integer getKeyword_id() {
+        return keyword_id;
+    }
+
+    public void setKeyword_id(Integer keyword_id) {
+        this.keyword_id = keyword_id;
+    }
+
+    public String getKeyword_name() {
+        return keyword_name;
+    }
+
+    public void setKeyword_name(String keyword_name) {
+        this.keyword_name = keyword_name;
+    }
+
+    public List<movie> getMovies() {
+        return movies;
+    }
+
+    public void setMovies(List<movie> movies) {
+        this.movies = movies;
+    }
 }

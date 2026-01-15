@@ -9,13 +9,12 @@ import java.util.List;
 
 @Entity
 public class movie {
-    // utilizar anotacion embeded id para las compuestas
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer movie_id;
     @Column(length = 1000)
     String title;
-    int budget;
+    Integer budget;
     @Column(length = 1000)
     String homepage;
     @Column(length = 1000)
@@ -27,7 +26,7 @@ public class movie {
 
     Long revenue;
 
-    int runtime;
+    Integer runtime;
     @Column(length = 50)
     String movie_status;
     @Column(length = 1000)
@@ -35,7 +34,7 @@ public class movie {
     @Column(precision = 4,scale = 2)
     BigDecimal vote_average;
 
-    int vote_count;
+    Integer vote_count;
 
     @ManyToMany
     @JoinTable(
@@ -68,4 +67,162 @@ public class movie {
             inverseJoinColumns = @JoinColumn(name = "company_id")
     )
     List<production_company> production_companies;
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    List<movie_cast> cast;
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    List<movie_crew> crew;
+
+    public Integer getMovie_id() {
+        return movie_id;
+    }
+
+    public void setMovie_id(Integer movie_id) {
+        this.movie_id = movie_id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Integer getBudget() {
+        return budget;
+    }
+
+    public void setBudget(Integer budget) {
+        this.budget = budget;
+    }
+
+    public String getHomepage() {
+        return homepage;
+    }
+
+    public void setHomepage(String homepage) {
+        this.homepage = homepage;
+    }
+
+    public String getOverview() {
+        return overview;
+    }
+
+    public void setOverview(String overview) {
+        this.overview = overview;
+    }
+
+    public BigDecimal getPopularity() {
+        return popularity;
+    }
+
+    public void setPopularity(BigDecimal popularity) {
+        this.popularity = popularity;
+    }
+
+    public LocalDate getRelease_date() {
+        return release_date;
+    }
+
+    public void setRelease_date(LocalDate release_date) {
+        this.release_date = release_date;
+    }
+
+    public Long getRevenue() {
+        return revenue;
+    }
+
+    public void setRevenue(Long revenue) {
+        this.revenue = revenue;
+    }
+
+    public Integer getRuntime() {
+        return runtime;
+    }
+
+    public void setRuntime(Integer runtime) {
+        this.runtime = runtime;
+    }
+
+    public String getMovie_status() {
+        return movie_status;
+    }
+
+    public void setMovie_status(String movie_status) {
+        this.movie_status = movie_status;
+    }
+
+    public String getTagline() {
+        return tagline;
+    }
+
+    public void setTagline(String tagline) {
+        this.tagline = tagline;
+    }
+
+    public BigDecimal getVote_average() {
+        return vote_average;
+    }
+
+    public void setVote_average(BigDecimal vote_average) {
+        this.vote_average = vote_average;
+    }
+
+    public Integer getVote_count() {
+        return vote_count;
+    }
+
+    public void setVote_count(Integer vote_count) {
+        this.vote_count = vote_count;
+    }
+
+    public List<country> getCountries() {
+        return countries;
+    }
+
+    public void setCountries(List<country> countries) {
+        this.countries = countries;
+    }
+
+    public List<genre> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(List<genre> genres) {
+        this.genres = genres;
+    }
+
+    public List<keyword> getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(List<keyword> keywords) {
+        this.keywords = keywords;
+    }
+
+    public List<production_company> getProduction_companies() {
+        return production_companies;
+    }
+
+    public void setProduction_companies(List<production_company> production_companies) {
+        this.production_companies = production_companies;
+    }
+
+    public List<movie_cast> getCast() {
+        return cast;
+    }
+
+    public void setCast(List<movie_cast> cast) {
+        this.cast = cast;
+    }
+
+    public List<movie_crew> getCrew() {
+        return crew;
+    }
+
+    public void setCrew(List<movie_crew> crew) {
+        this.crew = crew;
+    }
 }
