@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Neflyx2 - Cartelera</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 40px; background-color: #f4f7f6; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #e50914; text-align: center; }
+
+        /* Estilos del Buscador */
+        .search-container { margin-bottom: 20px; display: flex; gap: 10px; justify-content: center; }
+        input[type="text"] { padding: 10px; width: 60%; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px 20px; cursor: pointer; border: none; border-radius: 4px; transition: 0.3s; }
+        .btn-search { background-color: #e50914; color: white; }
+        .btn-clear { background-color: #6c757d; color: white; text-decoration: none; display: inline-block; line-height: 1.2; }
+        button:hover { opacity: 0.8; }
+
+        /* Estilos de la Tabla */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8f9fa; color: #333; }
+        tr:hover { background-color: #f1f1f1; }
+        .no-results { text-align: center; padding: 20px; color: #888; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Neflyx2</h1>
+
+    <form th:action="@{/}" method="get" class="search-container">
+        <input type="text"
+               name="keyword"
+               th:value="${keyword}"
+               placeholder="Buscar por título..."
+               autofocus
+               autocomplete="off">
+        <select name="genre">
+            <option value="">Todos los géneros</option>
+            <option value="Accion" th:selected="${selectedGenre == 'Accion'}">Acción</option>
+            <option value="Comedia" th:selected="${selectedGenre == 'Comedia'}">Comedia</option>
+            <option value="Drama" th:selected="${selectedGenre == 'Drama'}">Drama</option>
+        </select>
+
+        <input type="number" name="year" th:value="${selectedYear}" placeholder="Año (ej. 2024)" style="width: 100px;">
+        <button type="submit" class="btn-search">Buscar</button>
+        <a th:href="@{/}" class="btn-clear" th:if="${keyword != null}">Limpiar</a>
+    </form>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Título</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="movie : ${movies}">
+            <td th:text="${movie.title}">Título de ejemplo</td>
+        </tr>
+
+        <tr th:if="${#lists.isEmpty(movies)}">
+            <td class="no-results">No se encontraron películas que coincidan con la búsqueda.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
