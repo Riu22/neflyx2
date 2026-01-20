@@ -171,34 +171,41 @@
             cursor: pointer;
             transition: transform 0.3s ease, z-index 0s 0.3s;
             position: relative;
+            aspect-ratio: 2/3;
         }
 
         .movie-card:hover {
-            transform: scale(1.4);
+            transform: scale(1.05);
             z-index: 10;
             transition: transform 0.3s ease, z-index 0s;
         }
 
-        .movie-card:hover .movie-info {
-            opacity: 1;
-        }
-
         .movie-poster {
             width: 100%;
-            aspect-ratio: 16/9;
+            height: 100%;
             background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 3em;
             color: #404040;
+            background-size: cover;
+            background-position: center;
+            position: relative;
         }
 
         .movie-info {
-            padding: 12px;
-            background: #181818;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 12px 12px;
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.8) 50%, transparent 100%);
             opacity: 0;
             transition: opacity 0.3s;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
 
         .movie-card:hover .movie-info {
@@ -206,22 +213,24 @@
         }
 
         .movie-title {
-            font-size: 1em;
+            font-size: 1.1em;
             font-weight: 700;
-            margin-bottom: 8px;
             color: #fff;
             line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
 
         .movie-meta {
-            font-size: 0.9em;
+            font-size: 0.85em;
             color: #d2d2d2;
-            margin: 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .movie-meta strong {
-            color: #fff;
-            font-weight: 600;
+        .movie-year {
+            color: #bcbcbc;
+            font-size: 0.9em;
         }
 
         .movie-rating {
@@ -230,15 +239,20 @@
             gap: 4px;
             color: #46d369;
             font-weight: 700;
-            font-size: 0.9em;
-            margin-top: 6px;
+            font-size: 0.85em;
+            background: rgba(0,0,0,0.6);
+            padding: 2px 8px;
+            border-radius: 2px;
         }
 
         .movie-genres {
             color: #bcbcbc;
-            font-size: 0.85em;
-            margin-top: 6px;
+            font-size: 0.8em;
             line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .no-results {
@@ -352,7 +366,7 @@
 </head>
 <body>
 <nav class="navbar" id="navbar">
-    <div class="navbar-brand">NEFLYX2</div>
+    <div class="navbar-brand">MOVIEFLIX</div>
 </nav>
 
 <div class="container">
@@ -386,7 +400,7 @@
     <div id="welcomeMessage">
         <div class="no-results">
             <div class="no-results-icon">🎬</div>
-            <p>Usa los filtros para descubrir películas increíbles</p>
+            <p>Miles de películas te esperan. ¿Qué quieres ver hoy?</p>
         </div>
     </div>
 
@@ -396,6 +410,11 @@
 <script>
     let currentPage = 0;
     const pageSize = 24;
+    const TMDB_API_KEY = 'f306b8cfe840576c37edcc364e803cbd';
+    const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w500';
+
+    // Cache para imágenes de TMDb
+    const imageCache = new Map();
 
     // Navbar scroll effect
     window.addEventListener('scroll', () => {
@@ -422,7 +441,7 @@
 
             const data = await response.json();
             showLoading(false);
-            renderMovies(data.content);
+            await renderMovies(data.content);
             renderPagination(data);
 
         } catch (error) {
@@ -451,7 +470,7 @@
         return params;
     }
 
-    function renderMovies(movies) {
+    async function renderMovies(movies) {
         const grid = document.getElementById('movieGrid');
         const resultsSection = document.getElementById('resultsSection');
         const welcomeMessage = document.getElementById('welcomeMessage');
@@ -488,24 +507,84 @@
 
         document.getElementById('sectionTitle').textContent = titleText;
 
-        grid.innerHTML = movies.map(movie => createMovieCard(movie)).join('');
+        // Renderizar cards con placeholders primero
+        grid.innerHTML = movies.map(movie => createMovieCard(movie, null)).join('');
+
+        // Cargar imágenes de TMDb en paralelo
+        await loadMoviePosters(movies);
     }
 
-    function createMovieCard(movie) {
+    async function loadMoviePosters(movies) {
+        const promises = movies.map(async (movie, index) => {
+            const posterUrl = await getTMDbPoster(movie.title, movie.releaseDate);
+            if (posterUrl) {
+                // Actualizar solo el poster de esta película
+                const cards = document.querySelectorAll('.movie-card');
+                if (cards[index]) {
+                    const posterDiv = cards[index].querySelector('.movie-poster');
+                    posterDiv.style.backgroundImage = `url(${posterUrl})`;
+                    posterDiv.style.backgroundSize = 'cover';
+                    posterDiv.style.backgroundPosition = 'center';
+                    posterDiv.innerHTML = '';
+                }
+            }
+        });
+
+        await Promise.all(promises);
+    }
+
+    async function getTMDbPoster(title, releaseDate) {
+        // Verificar cache
+        const cacheKey = `${title}-${releaseDate}`;
+        if (imageCache.has(cacheKey)) {
+            return imageCache.get(cacheKey);
+        }
+
+        try {
+            const year = releaseDate ? new Date(releaseDate).getFullYear() : '';
+            const searchUrl = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(title)}${year ? `&year=${year}` : ''}`;
+
+            const response = await fetch(searchUrl);
+            const data = await response.json();
+
+            if (data.results && data.results.length > 0) {
+                const posterPath = data.results[0].poster_path;
+                if (posterPath) {
+                    const posterUrl = `${TMDB_IMAGE_BASE}${posterPath}`;
+                    imageCache.set(cacheKey, posterUrl);
+                    return posterUrl;
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching TMDb poster:', error);
+        }
+
+        return null;
+    }
+
+    function createMovieCard(movie, posterUrl) {
         const year = movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : 'N/A';
         const rating = movie.voteAverage ? parseFloat(movie.voteAverage).toFixed(1) : null;
         const genres = movie.genres || 'Sin géneros';
         const directors = movie.directors || 'Desconocido';
 
+        // Mostrar match percentage si hay rating
+        const matchPercentage = rating ? Math.round(parseFloat(rating) * 10) : null;
+
+        const posterStyle = posterUrl
+            ? `background-image: url(${posterUrl}); background-size: cover; background-position: center;`
+            : '';
+
         return `
             <div class="movie-card">
-                <div class="movie-poster">🎬</div>
+                <div class="movie-poster" style="${posterStyle}">
+                    ${!posterUrl ? '🎬' : ''}
+                </div>
                 <div class="movie-info">
                     <div class="movie-title">${escapeHtml(movie.title)}</div>
-                    <div class="movie-meta"><strong>Año:</strong> ${year}</div>
+                    ${matchPercentage ? `<div class="movie-rating">${matchPercentage}% Match</div>` : ''}
+                    <div class="movie-meta">${year}</div>
                     <div class="movie-genres">${escapeHtml(genres)}</div>
-                    <div class="movie-meta"><strong>Director:</strong> ${escapeHtml(directors)}</div>
-                    ${rating ? `<div class="movie-rating">⭐ ${rating}</div>` : ''}
                 </div>
             </div>
         `;
