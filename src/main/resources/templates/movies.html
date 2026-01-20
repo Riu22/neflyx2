@@ -1,70 +1,587 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Neflyx2 - Cartelera</title>
+    <title>MovieFlix - Buscador de Películas</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 40px; background-color: #f4f7f6; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { color: #e50914; text-align: center; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        /* Estilos del Buscador */
-        .search-container { margin-bottom: 20px; display: flex; gap: 10px; justify-content: center; }
-        input[type="text"] { padding: 10px; width: 60%; border: 1px solid #ccc; border-radius: 4px; }
-        button { padding: 10px 20px; cursor: pointer; border: none; border-radius: 4px; transition: 0.3s; }
-        .btn-search { background-color: #e50914; color: white; }
-        .btn-clear { background-color: #6c757d; color: white; text-decoration: none; display: inline-block; line-height: 1.2; }
-        button:hover { opacity: 0.8; }
+        body {
+            font-family: 'Netflix Sans', 'Helvetica Neue', Arial, sans-serif;
+            background: #141414;
+            color: #fff;
+            overflow-x: hidden;
+        }
 
-        /* Estilos de la Tabla */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #f8f9fa; color: #333; }
-        tr:hover { background-color: #f1f1f1; }
-        .no-results { text-align: center; padding: 20px; color: #888; }
+        /* Header / Navbar */
+        .navbar {
+            background: linear-gradient(180deg, rgba(0,0,0,0.7) 10%, transparent);
+            padding: 20px 4%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            transition: background-color 0.4s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .navbar.scrolled {
+            background: rgb(20, 20, 20);
+        }
+
+        .navbar-brand {
+            font-size: 2.5em;
+            font-weight: 800;
+            color: #0071eb;
+            letter-spacing: -2px;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 90px 4% 50px;
+        }
+
+        /* Filters Section */
+        .filters-section {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 40px;
+            border-radius: 4px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .filters-title {
+            font-size: 1.8em;
+            margin-bottom: 30px;
+            color: #e5e5e5;
+            font-weight: 500;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filter-input,
+        .filter-select {
+            width: 100%;
+            padding: 16px;
+            background: #333;
+            border: 1px solid #333;
+            border-radius: 2px;
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .filter-input::placeholder {
+            color: #8c8c8c;
+        }
+
+        .filter-input:focus,
+        .filter-select:focus {
+            outline: none;
+            border-color: #fff;
+            background: #454545;
+        }
+
+        .filter-select option {
+            background: #333;
+            color: #fff;
+        }
+
+        .btn-search {
+            width: 100%;
+            padding: 16px 24px;
+            background: #0071eb;
+            color: white;
+            border: none;
+            border-radius: 2px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-search:hover {
+            background: #0056b3;
+        }
+
+        .btn-search:active {
+            background: #003d82;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 100px;
+            display: none;
+            font-size: 1.3em;
+            color: #8c8c8c;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #0071eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Section Title */
+        .section-title {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            color: #e5e5e5;
+            font-weight: 700;
+            padding-left: 4%;
+        }
+
+        /* Movie Grid */
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 8px;
+            padding: 0 4%;
+            margin-bottom: 40px;
+        }
+
+        .movie-card {
+            background: #2f2f2f;
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease, z-index 0s 0.3s;
+            position: relative;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.4);
+            z-index: 10;
+            transition: transform 0.3s ease, z-index 0s;
+        }
+
+        .movie-card:hover .movie-info {
+            opacity: 1;
+        }
+
+        .movie-poster {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            color: #404040;
+        }
+
+        .movie-info {
+            padding: 12px;
+            background: #181818;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .movie-card:hover .movie-info {
+            opacity: 1;
+        }
+
+        .movie-title {
+            font-size: 1em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+            line-height: 1.2;
+        }
+
+        .movie-meta {
+            font-size: 0.9em;
+            color: #d2d2d2;
+            margin: 4px 0;
+        }
+
+        .movie-meta strong {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .movie-rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #46d369;
+            font-weight: 700;
+            font-size: 0.9em;
+            margin-top: 6px;
+        }
+
+        .movie-genres {
+            color: #bcbcbc;
+            font-size: 0.85em;
+            margin-top: 6px;
+            line-height: 1.3;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 100px 20px;
+            color: #8c8c8c;
+            font-size: 1.2em;
+        }
+
+        .no-results-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 40px 4%;
+        }
+
+        .pagination button {
+            padding: 10px 24px;
+            background: transparent;
+            color: white;
+            border: 1px solid gray;
+            border-radius: 2px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+        }
+
+        .pagination button:disabled {
+            color: gray;
+            border-color: #333;
+            cursor: not-allowed;
+        }
+
+        .pagination-info {
+            color: #e5e5e5;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .pagination-info strong {
+            color: #fff;
+        }
+
+        .page-count {
+            color: #808080;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .movie-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+
+        @media (max-width: 800px) {
+            .container {
+                padding: 80px 4% 30px;
+            }
+
+            .navbar {
+                padding: 15px 4%;
+            }
+
+            .navbar-brand {
+                font-size: 1.8em;
+            }
+
+            .movie-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 4px;
+            }
+
+            .movie-card:hover {
+                transform: scale(1.2);
+            }
+
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters-section {
+                padding: 20px;
+            }
+
+            .section-title {
+                font-size: 1.2em;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .movie-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
     </style>
 </head>
 <body>
+<nav class="navbar" id="navbar">
+    <div class="navbar-brand">NEFLYX2</div>
+</nav>
 
 <div class="container">
-    <h1>Neflyx2</h1>
+    <div class="filters-section">
+        <div class="filters-title">Buscar</div>
+        <div class="filter-grid">
+            <input type="text" id="keyword" class="filter-input" placeholder="Título">
+            <input type="number" id="year" class="filter-input" placeholder="Año" min="1900" max="2030">
+            <select id="genre" class="filter-select">
+                <option value="">Géneros</option>
+                <option th:each="g : ${genres_list}"
+                        th:value="${g.genre_name}"
+                        th:text="${g.genre_name}">
+                </option>
+            </select>
+            <input type="text" id="director" class="filter-input" placeholder="Director">
+        </div>
+        <button class="btn-search" onclick="searchMovies()">Buscar</button>
+    </div>
 
-    <form th:action="@{/}" method="get" class="search-container">
-        <input type="text"
-               name="keyword"
-               th:value="${keyword}"
-               placeholder="Buscar por título..."
-               autofocus
-               autocomplete="off">
-        <select name="genre">
-            <option value="">Todos los géneros</option>
-            <option value="Accion" th:selected="${selectedGenre == 'Accion'}">Acción</option>
-            <option value="Comedia" th:selected="${selectedGenre == 'Comedia'}">Comedia</option>
-            <option value="Drama" th:selected="${selectedGenre == 'Drama'}">Drama</option>
-        </select>
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+        Cargando películas...
+    </div>
 
-        <input type="number" name="year" th:value="${selectedYear}" placeholder="Año (ej. 2024)" style="width: 100px;">
-        <button type="submit" class="btn-search">Buscar</button>
-        <a th:href="@{/}" class="btn-clear" th:if="${keyword != null}">Limpiar</a>
-    </form>
+    <div id="resultsSection" style="display: none;">
+        <h2 class="section-title" id="sectionTitle">Resultados de búsqueda</h2>
+        <div class="movie-grid" id="movieGrid"></div>
+    </div>
 
-    <table>
-        <thead>
-        <tr>
-            <th>Título</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="movie : ${movies}">
-            <td th:text="${movie.title}">Título de ejemplo</td>
-        </tr>
+    <div id="welcomeMessage">
+        <div class="no-results">
+            <div class="no-results-icon">🎬</div>
+            <p>Usa los filtros para descubrir películas increíbles</p>
+        </div>
+    </div>
 
-        <tr th:if="${#lists.isEmpty(movies)}">
-            <td class="no-results">No se encontraron películas que coincidan con la búsqueda.</td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="pagination" id="pagination" style="display: none;"></div>
 </div>
 
+<script>
+    let currentPage = 0;
+    const pageSize = 24;
+
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+        const navbar = document.getElementById('navbar');
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+
+    async function searchMovies(page = 0) {
+        currentPage = page;
+        showLoading(true);
+
+        const params = buildSearchParams(page);
+
+        try {
+            const response = await fetch(`/movies/search?${params}`);
+
+            if (!response.ok) {
+                throw new Error('Error en la búsqueda');
+            }
+
+            const data = await response.json();
+            showLoading(false);
+            renderMovies(data.content);
+            renderPagination(data);
+
+        } catch (error) {
+            console.error('Error:', error);
+            showLoading(false);
+            showError('Error al cargar las películas. Por favor, intenta de nuevo.');
+        }
+    }
+
+    function buildSearchParams(page) {
+        const params = new URLSearchParams({
+            page: page,
+            size: pageSize
+        });
+
+        const keyword = document.getElementById('keyword').value.trim();
+        const year = document.getElementById('year').value;
+        const genre = document.getElementById('genre').value;
+        const director = document.getElementById('director').value.trim();
+
+        if (keyword) params.append('keyword', keyword);
+        if (year) params.append('year', year);
+        if (genre) params.append('genre', genre);
+        if (director) params.append('director', director);
+
+        return params;
+    }
+
+    function renderMovies(movies) {
+        const grid = document.getElementById('movieGrid');
+        const resultsSection = document.getElementById('resultsSection');
+        const welcomeMessage = document.getElementById('welcomeMessage');
+
+        if (!movies || movies.length === 0) {
+            resultsSection.style.display = 'none';
+            welcomeMessage.style.display = 'block';
+            welcomeMessage.innerHTML = `
+                <div class="no-results">
+                    <div class="no-results-icon">😔</div>
+                    <p>No se encontraron películas con esos filtros</p>
+                </div>
+            `;
+            return;
+        }
+
+        welcomeMessage.style.display = 'none';
+        resultsSection.style.display = 'block';
+
+        const filters = [];
+        const keyword = document.getElementById('keyword').value.trim();
+        const year = document.getElementById('year').value;
+        const genre = document.getElementById('genre').value;
+        const director = document.getElementById('director').value.trim();
+
+        if (keyword) filters.push(`"${keyword}"`);
+        if (year) filters.push(year);
+        if (genre) filters.push(genre);
+        if (director) filters.push(`director: ${director}`);
+
+        const titleText = filters.length > 0
+            ? `Resultados para: ${filters.join(' · ')}`
+            : 'Todas las películas';
+
+        document.getElementById('sectionTitle').textContent = titleText;
+
+        grid.innerHTML = movies.map(movie => createMovieCard(movie)).join('');
+    }
+
+    function createMovieCard(movie) {
+        const year = movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : 'N/A';
+        const rating = movie.voteAverage ? parseFloat(movie.voteAverage).toFixed(1) : null;
+        const genres = movie.genres || 'Sin géneros';
+        const directors = movie.directors || 'Desconocido';
+
+        return `
+            <div class="movie-card">
+                <div class="movie-poster">🎬</div>
+                <div class="movie-info">
+                    <div class="movie-title">${escapeHtml(movie.title)}</div>
+                    <div class="movie-meta"><strong>Año:</strong> ${year}</div>
+                    <div class="movie-genres">${escapeHtml(genres)}</div>
+                    <div class="movie-meta"><strong>Director:</strong> ${escapeHtml(directors)}</div>
+                    ${rating ? `<div class="movie-rating">⭐ ${rating}</div>` : ''}
+                </div>
+            </div>
+        `;
+    }
+
+    function renderPagination(data) {
+        const pagination = document.getElementById('pagination');
+
+        if (data.totalPages === 0) {
+            pagination.style.display = 'none';
+            return;
+        }
+
+        pagination.style.display = 'flex';
+
+        const prevDisabled = data.first ? 'disabled' : '';
+        const nextDisabled = data.last ? 'disabled' : '';
+
+        pagination.innerHTML = `
+            <button onclick="searchMovies(${currentPage - 1})" ${prevDisabled}>
+                ← Anterior
+            </button>
+
+            <span class="pagination-info">
+                Página <strong>${data.number + 1}</strong> de <strong>${data.totalPages}</strong>
+            </span>
+
+            <span class="page-count">(${data.totalElements} películas)</span>
+
+            <button onclick="searchMovies(${currentPage + 1})" ${nextDisabled}>
+                Siguiente →
+            </button>
+        `;
+    }
+
+    function showLoading(show) {
+        document.getElementById('loading').style.display = show ? 'block' : 'none';
+        if (show) {
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('welcomeMessage').style.display = 'none';
+            document.getElementById('pagination').style.display = 'none';
+        }
+    }
+
+    function showError(message) {
+        document.getElementById('welcomeMessage').style.display = 'block';
+        document.getElementById('welcomeMessage').innerHTML = `
+            <div class="no-results">
+                <div class="no-results-icon">❌</div>
+                <p>${escapeHtml(message)}</p>
+            </div>
+        `;
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        ['keyword', 'year', 'director'].forEach(id => {
+            document.getElementById(id).addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchMovies(0);
+                }
+            });
+        });
+
+        document.getElementById('genre').addEventListener('change', function() {
+            if (this.value) {
+                searchMovies(0);
+            }
+        });
+    });
+</script>
 </body>
 </html>

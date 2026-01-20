@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class movie {
@@ -42,15 +43,15 @@ public class movie {
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "country_id")
     )
-    List<country> countries;
+    Set<country> countries;
 
     @ManyToMany
     @JoinTable(
-            name = "movie_genre",
+            name = "movie_genres",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
-    List<genre> genres;
+    Set<genre> genres;
 
     @ManyToMany
     @JoinTable(
@@ -58,7 +59,7 @@ public class movie {
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "keyword_id")
     )
-    List<keyword> keywords;
+    Set<keyword> keywords;
 
     @ManyToMany
     @JoinTable(
@@ -66,13 +67,13 @@ public class movie {
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "company_id")
     )
-    List<production_company> production_companies;
+    Set<production_company> production_companies;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    List<movie_cast> cast;
+    Set<movie_cast> cast;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    List<movie_crew> crew;
+    Set<movie_crew> crew;
 
     public Integer getMovie_id() {
         return movie_id;
@@ -178,51 +179,51 @@ public class movie {
         this.vote_count = vote_count;
     }
 
-    public List<country> getCountries() {
+    public Set<country> getCountries() {
         return countries;
     }
 
-    public void setCountries(List<country> countries) {
+    public void setCountries(Set<country> countries) {
         this.countries = countries;
     }
 
-    public List<genre> getGenres() {
+    public Set<genre> getGenres() {
         return genres;
     }
 
-    public void setGenres(List<genre> genres) {
+    public void setGenres(Set<genre> genres) {
         this.genres = genres;
     }
 
-    public List<keyword> getKeywords() {
+    public Set<keyword> getKeywords() {
         return keywords;
     }
 
-    public void setKeywords(List<keyword> keywords) {
+    public void setKeywords(Set<keyword> keywords) {
         this.keywords = keywords;
     }
 
-    public List<production_company> getProduction_companies() {
+    public Set<production_company> getProduction_companies() {
         return production_companies;
     }
 
-    public void setProduction_companies(List<production_company> production_companies) {
+    public void setProduction_companies(Set<production_company> production_companies) {
         this.production_companies = production_companies;
     }
 
-    public List<movie_cast> getCast() {
+    public Set<movie_cast> getCast() {
         return cast;
     }
 
-    public void setCast(List<movie_cast> cast) {
+    public void setCast(Set<movie_cast> cast) {
         this.cast = cast;
     }
 
-    public List<movie_crew> getCrew() {
+    public Set<movie_crew> getCrew() {
         return crew;
     }
 
-    public void setCrew(List<movie_crew> crew) {
+    public void setCrew(Set<movie_crew> crew) {
         this.crew = crew;
     }
 }
