@@ -1,7 +1,6 @@
 package com.neflyx2.neflyx2.model.entiti;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.AnyDiscriminatorImplicitValues;
 
 import java.util.List;
 
@@ -14,7 +13,7 @@ public class language {
     @Column(length = 10)
     String language_code;
     @Column(length = 500)
-    String lenguage_name;
+    String language_name;
 
     @OneToMany(mappedBy = "language")
     List<movie_language> movie_languages;
@@ -35,12 +34,12 @@ public class language {
         this.language_code = language_code;
     }
 
-    public String getLenguage_name() {
-        return lenguage_name;
+    public String getLanguage_name() {
+        return language_name;
     }
 
-    public void setLenguage_name(String lenguage_name) {
-        this.lenguage_name = lenguage_name;
+    public void setLanguage_name(String language_name) {
+        this.language_name = language_name;
     }
 
     public List<movie_language> getMovie_languages() {

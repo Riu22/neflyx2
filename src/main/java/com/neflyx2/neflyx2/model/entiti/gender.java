@@ -7,8 +7,8 @@ public class gender {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer gender_id;
-    @Column(length = 100)
-    String genre_name;
+    @Column(length = 20)
+    String gender;
 
     public Integer getGender_id() {
         return gender_id;
@@ -19,10 +19,14 @@ public class gender {
     }
 
     public String getGenre_name() {
-        return genre_name;
+        return gender;
     }
 
-    public void setGenre_name(String genre_name) {
-        this.genre_name = genre_name;
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 }

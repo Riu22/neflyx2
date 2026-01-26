@@ -12,48 +12,49 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface movie_dao extends JpaRepository<movie, Integer> {
 
-    @Query(value = "SELECT m.movie_id as movieId, " +
-            "m.title as title, " +
-            "m.release_date as releaseDate, " +
-            "m.vote_average as voteAverage, " +
-            "GROUP_CONCAT(DISTINCT g.genre_name ORDER BY g.genre_name SEPARATOR ', ') as genres, " +
-            "GROUP_CONCAT(DISTINCT CASE WHEN mc.job = 'Director' THEN p.person_name END ORDER BY p.person_name SEPARATOR ', ') as directors " +
-            "FROM movie m " +
-            "LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id " +
-            "LEFT JOIN genre g ON mg.genre_id = g.genre_id " +
-            "LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id " +
-            "LEFT JOIN person p ON mc.person_id = p.person_id " +
-            "WHERE (:title IS NULL OR LOWER(m.title) LIKE LOWER(CONCAT('%', :title, '%'))) " +
-            "AND (:year IS NULL OR YEAR(m.release_date) = :year) " +
-            "AND (:genreName IS NULL OR :genreName = '' OR " +
-            "     EXISTS (SELECT 1 FROM movie_genres mg2 " +
-            "             JOIN genre g2 ON mg2.genre_id = g2.genre_id " +
-            "             WHERE mg2.movie_id = m.movie_id AND g2.genre_name = :genreName)) " +
-            "AND (:director IS NULL OR :director = '' OR " +
-            "     EXISTS (SELECT 1 FROM movie_crew mc2 " +
-            "             JOIN person p2 ON mc2.person_id = p2.person_id " +
-            "             WHERE mc2.movie_id = m.movie_id " +
-            "             AND mc2.job = 'Director' " +
-            "             AND LOWER(p2.person_name) LIKE LOWER(CONCAT('%', :director, '%')))) " +
-            "GROUP BY m.movie_id, m.title, m.release_date, m.vote_average " +
-            "ORDER BY m.release_date DESC",
-            countQuery = "SELECT COUNT(DISTINCT m.movie_id) FROM movie m " +
-                    "LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id " +
-                    "LEFT JOIN genre g ON mg.genre_id = g.genre_id " +
-                    "LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id " +
-                    "LEFT JOIN person p ON mc.person_id = p.person_id " +
-                    "WHERE (:title IS NULL OR LOWER(m.title) LIKE LOWER(CONCAT('%', :title, '%'))) " +
-                    "AND (:year IS NULL OR YEAR(m.release_date) = :year) " +
-                    "AND (:genreName IS NULL OR :genreName = '' OR " +
-                    "     EXISTS (SELECT 1 FROM movie_genres mg2 " +
-                    "             JOIN genre g2 ON mg2.genre_id = g2.genre_id " +
-                    "             WHERE mg2.movie_id = m.movie_id AND g2.genre_name = :genreName)) " +
-                    "AND (:director IS NULL OR :director = '' OR " +
-                    "     EXISTS (SELECT 1 FROM movie_crew mc2 " +
-                    "             JOIN person p2 ON mc2.person_id = p2.person_id " +
-                    "             WHERE mc2.movie_id = m.movie_id " +
-                    "             AND mc2.job = 'Director' " +
-                    "             AND LOWER(p2.person_name) LIKE LOWER(CONCAT('%', :director, '%'))))",
+    @Query(value = """
+        SELECT 
+            m.movie_id AS movieId, 
+            m.title AS title, 
+            m.release_date AS releaseDate, 
+            m.vote_average AS voteAverage, 
+            (SELECT GROUP_CONCAT(g.genre_name ORDER BY g.genre_name SEPARATOR ', ')
+             FROM movie_genres mg 
+             JOIN genre g ON mg.genre_id = g.genre_id 
+             WHERE mg.movie_id = m.movie_id) AS genres,
+            (SELECT GROUP_CONCAT(p.person_name ORDER BY p.person_name SEPARATOR ', ')
+             FROM movie_crew mc 
+             JOIN person p ON mc.person_id = p.person_id 
+             WHERE mc.movie_id = m.movie_id AND mc.job = 'Director') AS directors 
+        FROM movie m 
+        WHERE (:title IS NULL OR m.title LIKE CONCAT('%', :title, '%')) 
+          AND (:year IS NULL OR YEAR(m.release_date) = :year) 
+          AND (:genreName IS NULL OR :genreName = '' OR 
+               m.movie_id IN (SELECT mg2.movie_id 
+                              FROM movie_genres mg2 
+                              JOIN genre g2 ON mg2.genre_id = g2.genre_id 
+                              WHERE g2.genre_name = :genreName)) 
+          AND (:director IS NULL OR :director = '' OR 
+               m.movie_id IN (SELECT mc2.movie_id 
+                              FROM movie_crew mc2 
+                              JOIN person p2 ON mc2.person_id = p2.person_id 
+                              WHERE mc2.job = 'Director' 
+                              AND p2.person_name LIKE CONCAT('%', :director, '%'))) 
+        ORDER BY m.release_date DESC
+        """,
+            countQuery = """
+        SELECT COUNT(*) FROM movie m 
+        WHERE (:title IS NULL OR m.title LIKE CONCAT('%', :title, '%')) 
+          AND (:year IS NULL OR YEAR(m.release_date) = :year) 
+          AND (:genreName IS NULL OR :genreName = '' OR 
+               m.movie_id IN (SELECT mg2.movie_id FROM movie_genres mg2 
+                              JOIN genre g2 ON mg2.genre_id = g2.genre_id 
+                              WHERE g2.genre_name = :genreName)) 
+          AND (:director IS NULL OR :director = '' OR 
+               m.movie_id IN (SELECT mc2.movie_id FROM movie_crew mc2 
+                              JOIN person p2 ON mc2.person_id = p2.person_id 
+                              WHERE mc2.job = 'Director' AND p2.person_name LIKE CONCAT('%', :director, '%')))
+        """,
             nativeQuery = true)
     Page<MovieListDTO> findMoviesForList(@Param("title") String title,
                                          @Param("year") Integer year,

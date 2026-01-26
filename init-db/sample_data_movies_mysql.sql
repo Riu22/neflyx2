@@ -75,7 +75,7 @@ DROP TABLE IF EXISTS `gender`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `gender` (
-  `gender_id` int(10) NOT NULL,
+  `gender_id` int(10) NOT NULL AUTO_INCREMENT,
   `gender` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`gender_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -99,7 +99,7 @@ DROP TABLE IF EXISTS `genre`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `genre` (
-  `genre_id` int(10) NOT NULL,
+  `genre_id` int(10) NOT NULL AUTO_INCREMENT,
   `genre_name` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`genre_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -123,7 +123,7 @@ DROP TABLE IF EXISTS `keyword`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `keyword` (
-  `keyword_id` int(10) NOT NULL,
+  `keyword_id` int(10) NOT NULL AUTO_INCREMENT,
   `keyword_name` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`keyword_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -172,7 +172,7 @@ DROP TABLE IF EXISTS `language_role`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `language_role` (
-  `role_id` int(10) NOT NULL,
+  `role_id` int(10) NOT NULL AUTO_INCREMENT,
   `language_role` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -414,7 +414,7 @@ DROP TABLE IF EXISTS `person`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `person` (
-  `person_id` int(10) NOT NULL,
+  `person_id` int(10) NOT NULL AUTO_INCREMENT,
   `person_name` varchar(500) DEFAULT NULL,
   PRIMARY KEY (`person_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
