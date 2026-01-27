@@ -37,9 +37,10 @@ public class movie_controller {
             @RequestParam(required = false) Integer year,
             @RequestParam(required = false) String genre,
             @RequestParam(required = false) String director,
+            @RequestParam(required = false) String actor,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "24") int size) {
 
-        return movie_service.get_filtered_movies(keyword, year, genre, director, page, size);
+        return movie_service.get_filtered_movies(keyword, year, genre, director, actor, page, size);
     }
 }

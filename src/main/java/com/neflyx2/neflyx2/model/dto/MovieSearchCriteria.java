@@ -7,12 +7,14 @@ public record MovieSearchCriteria(
         Integer year,
         String genre,
         String director,
+        String actor,
         Pageable pageable
 ) {
     public MovieSearchCriteria{
         title = normalize(title);
         genre = normalize(genre);
         director = normalize(director);
+        actor = normalize(actor);
     }
     private String normalize(String value){
         return value != null ? value.trim() : null;
@@ -22,11 +24,10 @@ public record MovieSearchCriteria(
     public boolean has_year(){return year != null;}
     public boolean has_genre(){return genre != null;}
     public boolean has_director(){return director != null;}
+    public boolean has_actor(){return actor != null;}
 
     public boolean has_no_filters(){
-        return !has_title() && !has_year() && !has_genre() && !has_director();
+        return !has_title() && !has_year() && !has_genre() && !has_director() && !has_actor();
     }
-    public int get_active_filters_count(){
-        return (has_title() ? 1 : 0) + (has_year() ? 1 : 0) + (has_genre() ? 1 : 0) + (has_director() ? 1 : 0);
-    }
+
 }

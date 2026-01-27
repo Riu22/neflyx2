@@ -9,10 +9,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface movie_dao extends JpaRepository<movie, Integer> {
 
-    // Query básica
+    // Query básica - todas las películas
     @Query(value = """
         SELECT 
             m.movie_id AS movieId, 
@@ -31,101 +33,30 @@ public interface movie_dao extends JpaRepository<movie, Integer> {
             nativeQuery = true)
     Page<MovieListDTO> findAllMovies(Pageable pageable);
 
-    // Query por título
-    @Query(value = """
-        SELECT 
-            m.movie_id AS movieId, 
-            m.title AS title, 
-            m.release_date AS releaseDate, 
-            m.vote_average AS voteAverage,
-            GROUP_CONCAT(DISTINCT g.genre_name ORDER BY g.genre_name SEPARATOR ', ') AS genres,
-            NULL AS directors
-        FROM movie m 
-        LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id
-        LEFT JOIN genre g ON mg.genre_id = g.genre_id
-        WHERE m.title LIKE CONCAT('%', :title, '%')
-        GROUP BY m.movie_id, m.title, m.release_date, m.vote_average
-        ORDER BY m.release_date DESC
-        """,
-            countQuery = """
-        SELECT COUNT(*) FROM movie m 
-        WHERE m.title LIKE CONCAT('%', :title, '%')
-        """,
+    // Query por título - devuelve IDs
+    @Query(value = "SELECT movie_id FROM movie WHERE title LIKE CONCAT('%', :title, '%')",
             nativeQuery = true)
-    Page<MovieListDTO> findByTitle(@Param("title") String title, Pageable pageable);
+    List<Integer> findIdsByTitle(@Param("title") String title);
 
-    // Query por año
-    @Query(value = """
-        SELECT 
-            m.movie_id AS movieId, 
-            m.title AS title, 
-            m.release_date AS releaseDate, 
-            m.vote_average AS voteAverage,
-            GROUP_CONCAT(DISTINCT g.genre_name ORDER BY g.genre_name SEPARATOR ', ') AS genres,
-            NULL AS directors
-        FROM movie m 
-        LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id
-        LEFT JOIN genre g ON mg.genre_id = g.genre_id
-        WHERE YEAR(m.release_date) = :year
-        GROUP BY m.movie_id, m.title, m.release_date, m.vote_average
-        ORDER BY m.release_date DESC
-        """,
-            countQuery = """
-        SELECT COUNT(*) FROM movie m 
-        WHERE YEAR(m.release_date) = :year
-        """,
+    // Query por año - devuelve IDs
+    @Query(value = "SELECT movie_id FROM movie WHERE YEAR(release_date) = :year",
             nativeQuery = true)
-    Page<MovieListDTO> findByYear(@Param("year") Integer year, Pageable pageable);
+    List<Integer> findIdsByYear(@Param("year") Integer year);
 
-    // Query por género
+    // Query por género - devuelve IDs
     @Query(value = """
-        SELECT 
-            m.movie_id AS movieId, 
-            m.title AS title, 
-            m.release_date AS releaseDate, 
-            m.vote_average AS voteAverage,
-            GROUP_CONCAT(DISTINCT g2.genre_name ORDER BY g2.genre_name SEPARATOR ', ') AS genres,
-            NULL AS directors
-        FROM movie m 
-        INNER JOIN movie_genres mg ON m.movie_id = mg.movie_id 
-        INNER JOIN genre g ON mg.genre_id = g.genre_id
-        LEFT JOIN movie_genres mg2 ON m.movie_id = mg2.movie_id
-        LEFT JOIN genre g2 ON mg2.genre_id = g2.genre_id
-        WHERE g.genre_name = :genreName
-        GROUP BY m.movie_id, m.title, m.release_date, m.vote_average
-        ORDER BY m.release_date DESC
-        """,
-            countQuery = """
-        SELECT COUNT(DISTINCT m.movie_id) 
+        SELECT DISTINCT m.movie_id 
         FROM movie m 
         INNER JOIN movie_genres mg ON m.movie_id = mg.movie_id 
         INNER JOIN genre g ON mg.genre_id = g.genre_id 
         WHERE g.genre_name = :genreName
         """,
             nativeQuery = true)
-    Page<MovieListDTO> findByGenre(@Param("genreName") String genreName, Pageable pageable);
+    List<Integer> findIdsByGenre(@Param("genreName") String genreName);
 
-    // Query por director
+    // Query por director - devuelve IDs
     @Query(value = """
-        SELECT 
-            m.movie_id AS movieId, 
-            m.title AS title, 
-            m.release_date AS releaseDate, 
-            m.vote_average AS voteAverage,
-            GROUP_CONCAT(DISTINCT g.genre_name ORDER BY g.genre_name SEPARATOR ', ') AS genres,
-            NULL AS directors
-        FROM movie m 
-        INNER JOIN movie_crew mc ON m.movie_id = mc.movie_id 
-        INNER JOIN person p ON mc.person_id = p.person_id
-        LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id
-        LEFT JOIN genre g ON mg.genre_id = g.genre_id
-        WHERE mc.job = 'Director' 
-        AND p.person_name LIKE CONCAT('%', :director, '%')
-        GROUP BY m.movie_id, m.title, m.release_date, m.vote_average
-        ORDER BY m.release_date DESC
-        """,
-            countQuery = """
-        SELECT COUNT(DISTINCT m.movie_id) 
+        SELECT DISTINCT m.movie_id 
         FROM movie m 
         INNER JOIN movie_crew mc ON m.movie_id = mc.movie_id 
         INNER JOIN person p ON mc.person_id = p.person_id
@@ -133,9 +64,20 @@ public interface movie_dao extends JpaRepository<movie, Integer> {
         AND p.person_name LIKE CONCAT('%', :director, '%')
         """,
             nativeQuery = true)
-    Page<MovieListDTO> findByDirector(@Param("director") String director, Pageable pageable);
+    List<Integer> findIdsByDirector(@Param("director") String director);
 
-    // Query combinada: título + año
+    // Query por actor - devuelve IDs
+    @Query(value = """
+    SELECT DISTINCT m.movie_id 
+    FROM movie m 
+    INNER JOIN movie_cast mca ON m.movie_id = mca.movie_id 
+    INNER JOIN person p ON mca.person_id = p.person_id
+    WHERE p.person_name LIKE CONCAT('%', :actor, '%')
+    """,
+            nativeQuery = true)
+    List<Integer> findIdsByActor(@Param("actor") String actor);
+
+    // Query final - devuelve películas completas por IDs
     @Query(value = """
         SELECT 
             m.movie_id AS movieId, 
@@ -147,92 +89,11 @@ public interface movie_dao extends JpaRepository<movie, Integer> {
         FROM movie m 
         LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id
         LEFT JOIN genre g ON mg.genre_id = g.genre_id
-        WHERE m.title LIKE CONCAT('%', :title, '%')
-        AND YEAR(m.release_date) = :year
+        WHERE m.movie_id IN :ids
         GROUP BY m.movie_id, m.title, m.release_date, m.vote_average
         ORDER BY m.release_date DESC
         """,
-            countQuery = """
-        SELECT COUNT(*) FROM movie m 
-        WHERE m.title LIKE CONCAT('%', :title, '%')
-        AND YEAR(m.release_date) = :year
-        """,
+            countQuery = "SELECT COUNT(*) FROM movie WHERE movie_id IN :ids",
             nativeQuery = true)
-    Page<MovieListDTO> findByTitleAndYear(@Param("title") String title,
-                                          @Param("year") Integer year,
-                                          Pageable pageable);
-
-    // Query combinada: título + género
-    @Query(value = """
-        SELECT 
-            m.movie_id AS movieId, 
-            m.title AS title, 
-            m.release_date AS releaseDate, 
-            m.vote_average AS voteAverage,
-            GROUP_CONCAT(DISTINCT g2.genre_name ORDER BY g2.genre_name SEPARATOR ', ') AS genres,
-            NULL AS directors
-        FROM movie m 
-        INNER JOIN movie_genres mg ON m.movie_id = mg.movie_id 
-        INNER JOIN genre g ON mg.genre_id = g.genre_id
-        LEFT JOIN movie_genres mg2 ON m.movie_id = mg2.movie_id
-        LEFT JOIN genre g2 ON mg2.genre_id = g2.genre_id
-        WHERE m.title LIKE CONCAT('%', :title, '%')
-        AND g.genre_name = :genreName
-        GROUP BY m.movie_id, m.title, m.release_date, m.vote_average
-        ORDER BY m.release_date DESC
-        """,
-            countQuery = """
-        SELECT COUNT(DISTINCT m.movie_id) 
-        FROM movie m 
-        INNER JOIN movie_genres mg ON m.movie_id = mg.movie_id 
-        INNER JOIN genre g ON mg.genre_id = g.genre_id 
-        WHERE m.title LIKE CONCAT('%', :title, '%')
-        AND g.genre_name = :genreName
-        """,
-            nativeQuery = true)
-    Page<MovieListDTO> findByTitleAndGenre(@Param("title") String title,
-                                           @Param("genreName") String genreName,
-                                           Pageable pageable);
-
-    // Fallback para múltiples filtros
-    @Query(value = """
-        SELECT DISTINCT
-            m.movie_id AS movieId, 
-            m.title AS title, 
-            m.release_date AS releaseDate, 
-            m.vote_average AS voteAverage,
-            (SELECT GROUP_CONCAT(DISTINCT g3.genre_name ORDER BY g3.genre_name SEPARATOR ', ')
-             FROM movie_genres mg3
-             INNER JOIN genre g3 ON mg3.genre_id = g3.genre_id
-             WHERE mg3.movie_id = m.movie_id) AS genres,
-            NULL AS directors
-        FROM movie m 
-        LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id
-        LEFT JOIN genre g ON mg.genre_id = g.genre_id
-        LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id AND mc.job = 'Director'
-        LEFT JOIN person p ON mc.person_id = p.person_id
-        WHERE (:title IS NULL OR m.title LIKE CONCAT('%', :title, '%')) 
-          AND (:year IS NULL OR YEAR(m.release_date) = :year) 
-          AND (:genreName IS NULL OR :genreName = '' OR g.genre_name = :genreName) 
-          AND (:director IS NULL OR :director = '' OR p.person_name LIKE CONCAT('%', :director, '%'))
-        ORDER BY m.release_date DESC
-        """,
-            countQuery = """
-        SELECT COUNT(DISTINCT m.movie_id) 
-        FROM movie m 
-        LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id
-        LEFT JOIN genre g ON mg.genre_id = g.genre_id
-        LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id AND mc.job = 'Director'
-        LEFT JOIN person p ON mc.person_id = p.person_id
-        WHERE (:title IS NULL OR m.title LIKE CONCAT('%', :title, '%')) 
-          AND (:year IS NULL OR YEAR(m.release_date) = :year) 
-          AND (:genreName IS NULL OR :genreName = '' OR g.genre_name = :genreName) 
-          AND (:director IS NULL OR :director = '' OR p.person_name LIKE CONCAT('%', :director, '%'))
-        """,
-            nativeQuery = true)
-    Page<MovieListDTO> findMoviesForList(@Param("title") String title,
-                                         @Param("year") Integer year,
-                                         @Param("genreName") String genreName,
-                                         @Param("director") String director,
-                                         Pageable pageable);
+    Page<MovieListDTO> findMoviesByIds(@Param("ids") List<Integer> ids, Pageable pageable);
 }
