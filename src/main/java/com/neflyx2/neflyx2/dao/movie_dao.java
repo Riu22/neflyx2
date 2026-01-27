@@ -12,16 +12,19 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface movie_dao extends JpaRepository<movie, Integer> {
 
-    // Query básica - SIN generos ni directors
+    // Query básica
     @Query(value = """
         SELECT 
             m.movie_id AS movieId, 
             m.title AS title, 
             m.release_date AS releaseDate, 
             m.vote_average AS voteAverage,
-            NULL AS genres,
+            GROUP_CONCAT(DISTINCT g.genre_name ORDER BY g.genre_name SEPARATOR ', ') AS genres,
             NULL AS directors
         FROM movie m 
+        LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id
+        LEFT JOIN genre g ON mg.genre_id = g.genre_id
+        GROUP BY m.movie_id, m.title, m.release_date, m.vote_average
         ORDER BY m.release_date DESC
         """,
             countQuery = "SELECT COUNT(*) FROM movie",
@@ -35,10 +38,13 @@ public interface movie_dao extends JpaRepository<movie, Integer> {
             m.title AS title, 
             m.release_date AS releaseDate, 
             m.vote_average AS voteAverage,
-            NULL AS genres,
+            GROUP_CONCAT(DISTINCT g.genre_name ORDER BY g.genre_name SEPARATOR ', ') AS genres,
             NULL AS directors
         FROM movie m 
+        LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id
+        LEFT JOIN genre g ON mg.genre_id = g.genre_id
         WHERE m.title LIKE CONCAT('%', :title, '%')
+        GROUP BY m.movie_id, m.title, m.release_date, m.vote_average
         ORDER BY m.release_date DESC
         """,
             countQuery = """
@@ -55,10 +61,13 @@ public interface movie_dao extends JpaRepository<movie, Integer> {
             m.title AS title, 
             m.release_date AS releaseDate, 
             m.vote_average AS voteAverage,
-            NULL AS genres,
+            GROUP_CONCAT(DISTINCT g.genre_name ORDER BY g.genre_name SEPARATOR ', ') AS genres,
             NULL AS directors
         FROM movie m 
+        LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id
+        LEFT JOIN genre g ON mg.genre_id = g.genre_id
         WHERE YEAR(m.release_date) = :year
+        GROUP BY m.movie_id, m.title, m.release_date, m.vote_average
         ORDER BY m.release_date DESC
         """,
             countQuery = """
@@ -75,12 +84,15 @@ public interface movie_dao extends JpaRepository<movie, Integer> {
             m.title AS title, 
             m.release_date AS releaseDate, 
             m.vote_average AS voteAverage,
-            NULL AS genres,
+            GROUP_CONCAT(DISTINCT g2.genre_name ORDER BY g2.genre_name SEPARATOR ', ') AS genres,
             NULL AS directors
         FROM movie m 
         INNER JOIN movie_genres mg ON m.movie_id = mg.movie_id 
-        INNER JOIN genre g ON mg.genre_id = g.genre_id 
+        INNER JOIN genre g ON mg.genre_id = g.genre_id
+        LEFT JOIN movie_genres mg2 ON m.movie_id = mg2.movie_id
+        LEFT JOIN genre g2 ON mg2.genre_id = g2.genre_id
         WHERE g.genre_name = :genreName
+        GROUP BY m.movie_id, m.title, m.release_date, m.vote_average
         ORDER BY m.release_date DESC
         """,
             countQuery = """
@@ -100,13 +112,16 @@ public interface movie_dao extends JpaRepository<movie, Integer> {
             m.title AS title, 
             m.release_date AS releaseDate, 
             m.vote_average AS voteAverage,
-            NULL AS genres,
+            GROUP_CONCAT(DISTINCT g.genre_name ORDER BY g.genre_name SEPARATOR ', ') AS genres,
             NULL AS directors
         FROM movie m 
         INNER JOIN movie_crew mc ON m.movie_id = mc.movie_id 
         INNER JOIN person p ON mc.person_id = p.person_id
+        LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id
+        LEFT JOIN genre g ON mg.genre_id = g.genre_id
         WHERE mc.job = 'Director' 
         AND p.person_name LIKE CONCAT('%', :director, '%')
+        GROUP BY m.movie_id, m.title, m.release_date, m.vote_average
         ORDER BY m.release_date DESC
         """,
             countQuery = """
@@ -127,11 +142,14 @@ public interface movie_dao extends JpaRepository<movie, Integer> {
             m.title AS title, 
             m.release_date AS releaseDate, 
             m.vote_average AS voteAverage,
-            NULL AS genres,
+            GROUP_CONCAT(DISTINCT g.genre_name ORDER BY g.genre_name SEPARATOR ', ') AS genres,
             NULL AS directors
         FROM movie m 
+        LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id
+        LEFT JOIN genre g ON mg.genre_id = g.genre_id
         WHERE m.title LIKE CONCAT('%', :title, '%')
         AND YEAR(m.release_date) = :year
+        GROUP BY m.movie_id, m.title, m.release_date, m.vote_average
         ORDER BY m.release_date DESC
         """,
             countQuery = """
@@ -151,13 +169,16 @@ public interface movie_dao extends JpaRepository<movie, Integer> {
             m.title AS title, 
             m.release_date AS releaseDate, 
             m.vote_average AS voteAverage,
-            NULL AS genres,
+            GROUP_CONCAT(DISTINCT g2.genre_name ORDER BY g2.genre_name SEPARATOR ', ') AS genres,
             NULL AS directors
         FROM movie m 
         INNER JOIN movie_genres mg ON m.movie_id = mg.movie_id 
-        INNER JOIN genre g ON mg.genre_id = g.genre_id 
+        INNER JOIN genre g ON mg.genre_id = g.genre_id
+        LEFT JOIN movie_genres mg2 ON m.movie_id = mg2.movie_id
+        LEFT JOIN genre g2 ON mg2.genre_id = g2.genre_id
         WHERE m.title LIKE CONCAT('%', :title, '%')
         AND g.genre_name = :genreName
+        GROUP BY m.movie_id, m.title, m.release_date, m.vote_average
         ORDER BY m.release_date DESC
         """,
             countQuery = """
@@ -180,7 +201,10 @@ public interface movie_dao extends JpaRepository<movie, Integer> {
             m.title AS title, 
             m.release_date AS releaseDate, 
             m.vote_average AS voteAverage,
-            NULL AS genres,
+            (SELECT GROUP_CONCAT(DISTINCT g3.genre_name ORDER BY g3.genre_name SEPARATOR ', ')
+             FROM movie_genres mg3
+             INNER JOIN genre g3 ON mg3.genre_id = g3.genre_id
+             WHERE mg3.movie_id = m.movie_id) AS genres,
             NULL AS directors
         FROM movie m 
         LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id

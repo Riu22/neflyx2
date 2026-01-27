@@ -168,7 +168,6 @@
             background: #2f2f2f;
             border-radius: 4px;
             overflow: hidden;
-            cursor: pointer;
             transition: transform 0.3s ease, z-index 0s 0.3s;
             position: relative;
             aspect-ratio: 2/3;
@@ -178,6 +177,16 @@
             transform: scale(1.05);
             z-index: 10;
             transition: transform 0.3s ease, z-index 0s;
+        }
+
+        /* Link que envuelve todo el card */
+        .movie-link {
+            display: block;
+            width: 100%;
+            height: 100%;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
         }
 
         .movie-poster {
@@ -371,7 +380,7 @@
 
 <div class="container">
     <div class="filters-section">
-        <div class="filters-title">Buscars</div>
+        <div class="filters-title">Buscar</div>
         <div class="filter-grid">
             <input type="text" id="keyword" class="filter-input" placeholder="Título">
             <input type="number" id="year" class="filter-input" placeholder="Año" min="1900" max="2030">
@@ -577,15 +586,17 @@
 
         return `
             <div class="movie-card">
-                <div class="movie-poster" style="${posterStyle}">
-                    ${!posterUrl ? '🎬' : ''}
-                </div>
-                <div class="movie-info">
-                    <div class="movie-title">${escapeHtml(movie.title)}</div>
-                    ${matchPercentage ? `<div class="movie-rating">${matchPercentage}% Match</div>` : ''}
-                    <div class="movie-meta">${year}</div>
-                    <div class="movie-genres">${escapeHtml(genres)}</div>
-                </div>
+                <a href="/movies/detail/${movie.movieId}" class="movie-link">
+                    <div class="movie-poster" style="${posterStyle}">
+                        ${!posterUrl ? '🎬' : ''}
+                    </div>
+                    <div class="movie-info">
+                        <div class="movie-title">${escapeHtml(movie.title)}</div>
+                        ${matchPercentage ? `<div class="movie-rating">${matchPercentage}% Match</div>` : ''}
+                        <div class="movie-meta">${year}</div>
+                        <div class="movie-genres">${escapeHtml(genres)}</div>
+                    </div>
+                </a>
             </div>
         `;
     }
