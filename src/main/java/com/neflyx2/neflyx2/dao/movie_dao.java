@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface movie_dao extends JpaRepository<movie, Integer> {
 
-    // Query básica - SIN genres ni directors
+    // Query básica - SIN generos ni directors
     @Query(value = """
         SELECT 
             m.movie_id AS movieId, 
@@ -68,7 +68,7 @@ public interface movie_dao extends JpaRepository<movie, Integer> {
             nativeQuery = true)
     Page<MovieListDTO> findByYear(@Param("year") Integer year, Pageable pageable);
 
-    // Query por género - SIMPLE Y RÁPIDA
+    // Query por género
     @Query(value = """
         SELECT 
             m.movie_id AS movieId, 
@@ -93,7 +93,7 @@ public interface movie_dao extends JpaRepository<movie, Integer> {
             nativeQuery = true)
     Page<MovieListDTO> findByGenre(@Param("genreName") String genreName, Pageable pageable);
 
-    // Query por director - SIMPLE Y RÁPIDA
+    // Query por director
     @Query(value = """
         SELECT 
             m.movie_id AS movieId, 
@@ -173,7 +173,7 @@ public interface movie_dao extends JpaRepository<movie, Integer> {
                                            @Param("genreName") String genreName,
                                            Pageable pageable);
 
-    // Fallback SIMPLIFICADO para múltiples filtros
+    // Fallback para múltiples filtros
     @Query(value = """
         SELECT DISTINCT
             m.movie_id AS movieId, 
