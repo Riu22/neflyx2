@@ -23,7 +23,7 @@ public class movie_service {
     public Page<MovieListDTO> get_filtered_movies(String title, Integer year, String genre,
                                                   String actor, String director, int page, int size) {
         MovieSearchCriteria criteria = new MovieSearchCriteria(
-                title, year, genre, director, actor, PageRequest.of(page, size)
+                title, year, genre, actor, director, PageRequest.of(page, size)
         );
 
         logger.info("Buscando movies con filtros: {}", criteria);

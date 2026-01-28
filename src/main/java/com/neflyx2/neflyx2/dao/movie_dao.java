@@ -56,25 +56,22 @@ public interface movie_dao extends JpaRepository<movie, Integer> {
 
     // Query por director - devuelve IDs
     @Query(value = """
-        SELECT DISTINCT m.movie_id 
-        FROM movie m 
-        INNER JOIN movie_crew mc ON m.movie_id = mc.movie_id 
-        INNER JOIN person p ON mc.person_id = p.person_id
-        WHERE mc.job = 'Director' 
-        AND p.person_name LIKE CONCAT('%', :director, '%')
-        """,
-            nativeQuery = true)
+    SELECT DISTINCT m.movie_id 
+    FROM movie m 
+    JOIN movie_crew mc ON m.movie_id = mc.movie_id 
+    JOIN person p ON mc.person_id = p.person_id
+    WHERE mc.job = 'Director' 
+    AND p.person_name LIKE CONCAT('%', :director, '%')
+    """, nativeQuery = true)
     List<Integer> findIdsByDirector(@Param("director") String director);
 
-    // Query por actor - devuelve IDs
     @Query(value = """
     SELECT DISTINCT m.movie_id 
     FROM movie m 
-    INNER JOIN movie_cast mca ON m.movie_id = mca.movie_id 
-    INNER JOIN person p ON mca.person_id = p.person_id
+    JOIN movie_cast mca ON m.movie_id = mca.movie_id 
+    JOIN person p ON mca.person_id = p.person_id
     WHERE p.person_name LIKE CONCAT('%', :actor, '%')
-    """,
-            nativeQuery = true)
+    """, nativeQuery = true)
     List<Integer> findIdsByActor(@Param("actor") String actor);
 
     // Query final - devuelve películas completas por IDs
