@@ -21,78 +21,67 @@ public class movie_service {
     movie_dao movie_dao;
 
     public Page<MovieListDTO> get_filtered_movies(String title, Integer year, String genre,
-                                                  String actor, String director, int page, int size) {
+                                                  String actor, String director, String character, int page, int size) {
+
+        // CORRECCIÓN: El orden debe coincidir EXACTAMENTE con el Record:
+        // title, year, genre, director, actor, character
         MovieSearchCriteria criteria = new MovieSearchCriteria(
-                title, year, genre, actor, director, PageRequest.of(page, size)
+                title, year, genre, director, actor, character, PageRequest.of(page, size)
         );
 
-        logger.info("Buscando movies con filtros: {}", criteria);
-        long start_time = System.currentTimeMillis();
-
-        Page<MovieListDTO> result = execute_search(criteria);
-
-        logger.info("Encontrados {} en {}ms",
-                result.getTotalElements(),
-                System.currentTimeMillis() - start_time);
-
-        return result;
+        logger.info("Buscando con criterios: {}", criteria);
+        return execute_search(criteria);
     }
 
     private Page<MovieListDTO> execute_search(MovieSearchCriteria criteria) {
-        // Sin filtros - devuelve todas
         if (criteria.has_no_filters()) {
             return movie_dao.findAllMovies(criteria.pageable());
         }
 
-        // Obtener IDs que cumplen cada filtro
         List<Set<Integer>> filter_results = new ArrayList<>();
 
+        // Función auxiliar para no repetir código y validar si el filtro vacía el resultado
         if (criteria.has_title()) {
-            Set<Integer> title_ids = new HashSet<>(movie_dao.findIdsByTitle(criteria.title()));
-            filter_results.add(title_ids);
-            logger.debug("Películas con título '{}': {}", criteria.title(), title_ids.size());
+            Set<Integer> ids = new HashSet<>(movie_dao.findIdsByTitle(criteria.title()));
+            if (ids.isEmpty()) return Page.empty(criteria.pageable()); // Si un filtro da 0, el total es 0
+            filter_results.add(ids);
         }
 
         if (criteria.has_year()) {
-            Set<Integer> year_ids = new HashSet<>(movie_dao.findIdsByYear(criteria.year()));
-            filter_results.add(year_ids);
-            logger.debug("Películas del año {}: {}", criteria.year(), year_ids.size());
+            Set<Integer> ids = new HashSet<>(movie_dao.findIdsByYear(criteria.year()));
+            if (ids.isEmpty()) return Page.empty(criteria.pageable());
+            filter_results.add(ids);
         }
 
         if (criteria.has_genre()) {
-            Set<Integer> genre_ids = new HashSet<>(movie_dao.findIdsByGenre(criteria.genre()));
-            filter_results.add(genre_ids);
-            logger.debug("Películas del género '{}': {}", criteria.genre(), genre_ids.size());
+            Set<Integer> ids = new HashSet<>(movie_dao.findIdsByGenre(criteria.genre()));
+            if (ids.isEmpty()) return Page.empty(criteria.pageable());
+            filter_results.add(ids);
         }
 
         if (criteria.has_director()) {
-            Set<Integer> director_ids = new HashSet<>(movie_dao.findIdsByDirector(criteria.director()));
-            filter_results.add(director_ids);
-            logger.debug("Películas del director '{}': {}", criteria.director(), director_ids.size());
+            Set<Integer> ids = new HashSet<>(movie_dao.findIdsByDirector(criteria.director()));
+            if (ids.isEmpty()) return Page.empty(criteria.pageable());
+            filter_results.add(ids);
         }
 
         if (criteria.has_actor()) {
-            Set<Integer> actor_ids = new HashSet<>(movie_dao.findIdsByActor(criteria.actor()));
-            filter_results.add(actor_ids);
-            logger.debug("Películas del actor '{}': {}", criteria.actor(), actor_ids.size());
+            Set<Integer> ids = new HashSet<>(movie_dao.findIdsByActor(criteria.actor()));
+            if (ids.isEmpty()) return Page.empty(criteria.pageable());
+            filter_results.add(ids);
         }
 
-        // Intersección de todos los sets (AND lógico)
+        if (criteria.has_character()) {
+            Set<Integer> ids = new HashSet<>(movie_dao.findIdsByCharacter(criteria.character()));
+            if (ids.isEmpty()) return Page.empty(criteria.pageable());
+            filter_results.add(ids);
+        }
+
         Set<Integer> final_ids = intersect_all(filter_results);
 
-        logger.info("IDs finales después de aplicar {} filtros: {}",
-                filter_results.size(), final_ids.size());
+        if (final_ids.isEmpty()) return Page.empty(criteria.pageable());
 
-        // Si no hay resultados, devolver página vacía
-        if (final_ids.isEmpty()) {
-            return Page.empty(criteria.pageable());
-        }
-
-        // Convertir Set a List para la query
-        List<Integer> ids_list = new ArrayList<>(final_ids);
-
-        // Obtener las películas completas con paginación
-        return movie_dao.findMoviesByIds(ids_list, criteria.pageable());
+        return movie_dao.findMoviesByIds(new ArrayList<>(final_ids), criteria.pageable());
     }
 
 

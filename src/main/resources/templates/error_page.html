@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Acceso Denegado - Neflyx2</title>
+    <style>
+        body {
+            font-family: 'Netflix Sans', Arial, sans-serif;
+            background: #141414;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            border-top: 4px solid #0071eb;
+            background: #1f1f1f;
+            padding: 50px;
+            border-radius: 4px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        h1 { font-size: 3em; margin-bottom: 10px; color: #0071eb; }
+        p { color: #8c8c8c; font-size: 1.2em; margin-bottom: 30px; }
+        .btn {
+            background: #0071eb;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>:(</h1>
+    <p th:text="${errorMsg}">Mensaje de error por defecto</p>
+    <a href="/neflyx2/login" class="btn">Iniciar Sesión</a>
+</div>
+</body>
+</html>

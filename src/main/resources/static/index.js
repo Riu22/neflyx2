@@ -40,28 +40,40 @@ async function searchMovies(page = 0) {
         showError('Error al cargar las películas. Por favor, intenta de nuevo.');
     }
 }
-
 function buildSearchParams(page) {
     const params = new URLSearchParams({
         page: page,
         size: pageSize
     });
 
+    // Asegúrate de que los IDs coincidan con tu HTML
     const keyword = document.getElementById('keyword').value.trim();
     const year = document.getElementById('year').value;
     const genre = document.getElementById('genre').value;
     const director = document.getElementById('director').value.trim();
-    const actor = document.getElementById('actor').value.trim(); // ✨ AGREGADO
+    const actor = document.getElementById('actor').value.trim();
+    const character = document.getElementById('character').value.trim();
 
     if (keyword) params.append('keyword', keyword);
     if (year) params.append('year', year);
     if (genre) params.append('genre', genre);
     if (director) params.append('director', director);
-    if (actor) params.append('actor', actor); // ✨ AGREGADO
+    if (actor) params.append('actor', actor);
+    if (character) params.append('character', character); // ✨ Enviando al controlador
 
     return params;
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+    ['keyword', 'year', 'director', 'actor', 'character'].forEach(id => { 
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') searchMovies(0);
+            });
+        }
+    });
+});
 async function renderMovies(movies) {
     const grid = document.getElementById('movieGrid');
     const resultsSection = document.getElementById('resultsSection');

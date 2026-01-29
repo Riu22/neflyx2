@@ -1,10 +1,194 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${movie.title} + ' - Neflyx2'">Detalles de la Película</title>
+    <style>
+        /* REUTILIZACIÓN DE TU CSS */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Netflix Sans', 'Helvetica Neue', Arial, sans-serif;
+            background: #141414;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background: rgb(20, 20, 20);
+            padding: 20px 4%;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .navbar-brand {
+            font-size: 2.5em;
+            font-weight: 800;
+            color: #0071eb;
+            letter-spacing: -2px;
+            text-decoration: none;
+        }
+
+        /* ESTILOS ESPECÍFICOS PARA DETALLES */
+        .hero-section {
+            height: 70vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 0 4%;
+            background: linear-gradient(to right, #141414 10%, rgba(20,20,20,0) 100%),
+                        linear-gradient(to top, #141414 0%, rgba(20,20,20,0) 20%);
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hero-content {
+            max-width: 600px;
+            z-index: 2;
+            margin-top: 80px;
+        }
+
+        .hero-title {
+            font-size: 4em;
+            font-weight: 800;
+            margin-bottom: 0.2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .hero-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            color: #bcbcbc;
+        }
+
+        .rating-bold {
+            color: #46d369;
+            font-weight: 700;
+        }
+
+        .detail-container {
+            padding: 40px 4%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 50px;
+        }
+
+        .overview-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            color: #e5e5e5;
+        }
+
+        .metadata-sidebar {
+            background: rgba(255,255,255,0.05);
+            padding: 25px;
+            border-radius: 4px;
+        }
+
+        .meta-item {
+            margin-bottom: 15px;
+        }
+
+        .meta-label {
+            color: #808080;
+            display: block;
+            font-size: 0.9em;
+            margin-bottom: 4px;
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 24px;
+            background: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .btn-back:hover { background: #454545; }
+
+        .tagline-text {
+            font-size: 1.3em;
+            color: #bcbcbc;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 800px) {
+            .hero-title { font-size: 2.5em; }
+            .info-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
-detalles
+
+<nav class="navbar">
+    <a href="/" class="navbar-brand">NEFLYX2</a>
+</nav>
+
+<div th:if="${movie != null}">
+    <div class="hero-section" style="background-image: linear-gradient(to right, #141414 20%, rgba(20,20,20,0) 100%), url('https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=2059&auto=format&fit=crop');">
+        <div class="hero-content">
+            <h1 class="hero-title" th:text="${movie.title}">Título</h1>
+            <p class="tagline-text" th:text="${movie.tagline}">Tagline de la peli</p>
+            <div class="hero-meta">
+                <span class="rating-bold" th:text="${movie.vote_average} + ' de valoración'">8.5</span>
+                <span th:text="${#temporals.format(movie.release_date, 'yyyy')}">2024</span>
+                <span th:text="${movie.runtime} + ' min'">120 min</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="detail-container">
+        <div class="info-grid">
+            <div>
+                <h3 style="color: #808080; margin-bottom: 10px;">Sinopsis</h3>
+                <p class="overview-text" th:text="${movie.overview}">Resumen de la película...</p>
+
+                <a href="/" class="btn-back">← Volver al listado</a>
+            </div>
+
+            <div class="metadata-sidebar">
+                <div class="meta-item">
+                    <span class="meta-label">Estado</span>
+                    <span th:text="${movie.movie_status}">Released</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Presupuesto</span>
+                    <span th:text="${movie.budget > 0 ? '$' + #numbers.formatDecimal(movie.budget, 0, 'COMMA', 0, 'POINT') : 'Desconocido'}">$0</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Recaudación</span>
+                    <span th:text="${movie.revenue > 0 ? '$' + #numbers.formatDecimal(movie.revenue, 0, 'COMMA', 0, 'POINT') : 'Desconocido'}">$0</span>
+                </div>
+                <div class="meta-item" th:if="${movie.homepage != null and !movie.homepage.isEmpty()}">
+                    <span class="meta-label">Sitio Web</span>
+                    <a th:href="${movie.homepage}" target="_blank" style="color: #0071eb;">Visitar página oficial</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:unless="${movie != null}" style="padding: 150px 4%; text-align: center;">
+    <h2>Película no encontrada</h2>
+    <a href="/" class="btn-search" style="display: inline-block; width: auto; margin-top: 20px;">Volver al inicio</a>
+</div>
+
 </body>
 </html>

@@ -1,5 +1,6 @@
 package com.neflyx2.neflyx2.dao;
 
+import com.neflyx2.neflyx2.model.dto.MovieDTO;
 import com.neflyx2.neflyx2.model.dto.MovieListDTO;
 import com.neflyx2.neflyx2.model.entiti.movie;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface movie_dao extends JpaRepository<movie, Integer> {
@@ -93,4 +95,21 @@ public interface movie_dao extends JpaRepository<movie, Integer> {
             countQuery = "SELECT COUNT(*) FROM movie WHERE movie_id IN :ids",
             nativeQuery = true)
     Page<MovieListDTO> findMoviesByIds(@Param("ids") List<Integer> ids, Pageable pageable);
+
+    @Query(value = """
+    SELECT 
+        movie_id, title, budget, homepage, overview, 
+        popularity, release_date, revenue, runtime, 
+        movie_status, tagline, vote_average, vote_count
+    FROM movie 
+    WHERE movie_id = :id
+    """, nativeQuery = true)
+    Optional<MovieDTO> findMovieById(@Param("id") Integer id);
+
+    @Query(value = """
+    SELECT DISTINCT movie_id 
+    FROM movie_cast 
+    WHERE character_name LIKE CONCAT('%', :character, '%')
+    """, nativeQuery = true)
+    List<Integer> findIdsByCharacter(@Param("character") String character);
 }
