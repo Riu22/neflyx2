@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nuevo Cast - Neflyx2</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="container">
+    <h2>Asignar Actor a Película</h2>
+
+    <form th:action="@{/admin/movie_cast/save}" th:object="${item}" method="post" class="filters-section" style="display: block;">
+
+        <div style="margin-bottom: 15px;">
+            <label>Película:</label><br>
+            <select th:field="*{movie.movie_id}" class="filter-select" style="width: 100%;" required>
+                <option value="" disabled selected>Seleccione una película...</option>
+                <option th:each="m : ${movies}" th:value="${m.movie_id}" th:text="${m.title}"></option>
+            </select>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label>Persona (Actor):</label><br>
+            <select th:field="*{person.person_id}" class="filter-select" style="width: 100%;" required>
+                <option value="" disabled selected>Seleccione un actor...</option>
+                <option th:each="p : ${persons}" th:value="${p.person_id}" th:text="${p.person_name}"></option>
+            </select>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label>Nombre del Personaje:</label><br>
+            <input type="text" th:field="*{character_name}" class="filter-input" style="width: 100%;" placeholder="Ej: Tony Stark" required>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label>Género (Opcional):</label><br>
+            <select th:field="*{gender.gender_id}" class="filter-select" style="width: 100%;">
+                <option value="0">Desconocido</option>
+                <option value="1">Mujer</option>
+                <option value="2">Hombre</option>
+                <option value="3">No binario</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn-search">Guardar Reparto</button>
+        <a href="/admin/list/movie_cast" class="btn-search" style="background:#444; text-decoration:none; display:inline-block; text-align:center;">Cancelar</a>
+    </form>
+</div>
+</body>
+</html>

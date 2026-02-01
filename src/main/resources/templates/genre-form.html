@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestionar Género</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="container">
+    <h2 th:text="${item == null ? 'Nuevo Género' : 'Editar Género'}"></h2>
+
+    <form th:action="@{/admin/save/genre}" method="post" class="filters-section" style="display: block;">
+        <input type="hidden" name="genre_id" th:value="${item?.genre_id}">
+
+        <div style="margin-bottom: 20px;">
+            <label>Nombre del Género:</label>
+            <input type="text" name="genre_name" th:value="${item?.genre_name}"
+                   class="filter-input" style="width: 100%;" required>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button type="submit" class="btn-search" style="flex: 1;">Guardar</button>
+            <a href="/admin/list/genre" class="btn-search" style="background:#444; flex: 1; text-align:center; text-decoration:none;">Cancelar</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

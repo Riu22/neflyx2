@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Neflyx2 Admin</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="container" style="text-align: center; padding-top: 50px;">
+    <h1>Panel de Control Neflyx2</h1>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px;">
+        <a th:href="@{/admin/list/movie}" class="btn-search" style="text-decoration:none">🎬 Películas</a>
+        <a th:href="@{/admin/list/person}" class="btn-search" style="text-decoration:none">👤 Personas</a>
+        <a th:href="@{/admin/list/genre}" class="btn-search" style="text-decoration:none">🏷️ Géneros</a>
+        <a th:href="@{/admin/list/country}" class="btn-search" style="text-decoration:none">🌍 Países</a>
+        <a th:href="@{/admin/list/movie_cast}" class="btn-search" style="background:#333; text-decoration:none">🎭 Reparto (Cast)</a>
+        <a th:href="@{/admin/list/movie_crew}" class="btn-search" style="background:#333; text-decoration:none">🎥 Equipo (Crew)</a>
+    </div>
+    <br><br>
+    <a href="/" class="btn-search" style="background:#e50914">Ir a la Web Pública</a>
+</div>
+</body>
+</html>

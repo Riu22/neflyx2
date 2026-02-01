@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestionar Persona</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="container">
+    <h2>Datos de la Persona</h2>
+    <form th:action="@{/admin/save/person}" method="post" class="filters-section" style="display: block;">
+        <input type="hidden" name="person_id" th:value="${item?.person_id}">
+
+        <label>Nombre Completo:</label>
+        <input type="text" name="person_name" th:value="${item?.person_name}" class="filter-input" style="width: 100%;" required>
+
+        <div style="margin-top: 20px;">
+            <button type="submit" class="btn-search">Guardar Persona</button>
+            <a href="/admin/list/person" class="btn-search" style="background:#444; text-decoration:none;">Volver</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

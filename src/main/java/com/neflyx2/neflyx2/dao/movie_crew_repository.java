@@ -1,9 +1,9 @@
 package com.neflyx2.neflyx2.dao;
 
-import com.neflyx2.neflyx2.model.entiti.genre;
+import com.neflyx2.neflyx2.model.entiti.movie_crew;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface genre_dao extends JpaRepository<genre, Integer> {
+public interface movie_crew_repository extends JpaRepository<movie_crew, Integer> {
 }

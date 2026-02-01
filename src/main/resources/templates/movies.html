@@ -5,7 +5,6 @@
     <title>MovieFlix - Buscador de Películas</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-
 </head>
 <body>
 <nav class="navbar" id="navbar">
@@ -37,7 +36,17 @@
             <input type="text" id="actor" class="filter-input" placeholder="Actor">
             <input type="text" id="character" class="filter-input" placeholder="Personaje (ej: Jack Sparrow)">
         </div>
-        <button class="btn-search" onclick="searchMovies()">Buscar</button>
+
+        <div class="button-group" style="display: flex; gap: 10px; margin-top: 15px;">
+            <button class="btn-search" onclick="searchMovies()" style="flex: 1;">Buscar</button>
+
+            <a th:if="${session.username != null}"
+               href="/admin/dashboard"
+               class="btn-search"
+               style="flex: 1; text-align: center; text-decoration: none; background-color: #444;">
+                Panel Admin
+            </a>
+        </div>
     </div>
 
     <div class="loading" id="loading">

@@ -19,7 +19,7 @@ public class Neflyx2Application implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(interceptor).addPathPatterns("/movies/**").excludePathPatterns("/movies/search");
+        registry.addInterceptor(interceptor).addPathPatterns("/admin/**");
 
     }
 }

@@ -1,6 +1,6 @@
 package com.neflyx2.neflyx2.service;
 
-import com.neflyx2.neflyx2.dao.movie_dao;
+import com.neflyx2.neflyx2.dao.movie_repository;
 import com.neflyx2.neflyx2.model.dto.MovieListDTO;
 import com.neflyx2.neflyx2.model.dto.MovieSearchCriteria;
 import org.slf4j.Logger;
@@ -18,7 +18,7 @@ public class movie_service {
     private static final Logger logger = LoggerFactory.getLogger(movie_service.class);
 
     @Autowired
-    movie_dao movie_dao;
+    movie_repository movie_repository;
 
     public Page<MovieListDTO> get_filtered_movies(String title, Integer year, String genre,
                                                   String actor, String director, String character, int page, int size) {
@@ -35,44 +35,44 @@ public class movie_service {
 
     private Page<MovieListDTO> execute_search(MovieSearchCriteria criteria) {
         if (criteria.has_no_filters()) {
-            return movie_dao.findAllMovies(criteria.pageable());
+            return movie_repository.findAllMovies(criteria.pageable());
         }
 
         List<Set<Integer>> filter_results = new ArrayList<>();
 
         // Función auxiliar para no repetir código y validar si el filtro vacía el resultado
         if (criteria.has_title()) {
-            Set<Integer> ids = new HashSet<>(movie_dao.findIdsByTitle(criteria.title()));
+            Set<Integer> ids = new HashSet<>(movie_repository.findIdsByTitle(criteria.title()));
             if (ids.isEmpty()) return Page.empty(criteria.pageable()); // Si un filtro da 0, el total es 0
             filter_results.add(ids);
         }
 
         if (criteria.has_year()) {
-            Set<Integer> ids = new HashSet<>(movie_dao.findIdsByYear(criteria.year()));
+            Set<Integer> ids = new HashSet<>(movie_repository.findIdsByYear(criteria.year()));
             if (ids.isEmpty()) return Page.empty(criteria.pageable());
             filter_results.add(ids);
         }
 
         if (criteria.has_genre()) {
-            Set<Integer> ids = new HashSet<>(movie_dao.findIdsByGenre(criteria.genre()));
+            Set<Integer> ids = new HashSet<>(movie_repository.findIdsByGenre(criteria.genre()));
             if (ids.isEmpty()) return Page.empty(criteria.pageable());
             filter_results.add(ids);
         }
 
         if (criteria.has_director()) {
-            Set<Integer> ids = new HashSet<>(movie_dao.findIdsByDirector(criteria.director()));
+            Set<Integer> ids = new HashSet<>(movie_repository.findIdsByDirector(criteria.director()));
             if (ids.isEmpty()) return Page.empty(criteria.pageable());
             filter_results.add(ids);
         }
 
         if (criteria.has_actor()) {
-            Set<Integer> ids = new HashSet<>(movie_dao.findIdsByActor(criteria.actor()));
+            Set<Integer> ids = new HashSet<>(movie_repository.findIdsByActor(criteria.actor()));
             if (ids.isEmpty()) return Page.empty(criteria.pageable());
             filter_results.add(ids);
         }
 
         if (criteria.has_character()) {
-            Set<Integer> ids = new HashSet<>(movie_dao.findIdsByCharacter(criteria.character()));
+            Set<Integer> ids = new HashSet<>(movie_repository.findIdsByCharacter(criteria.character()));
             if (ids.isEmpty()) return Page.empty(criteria.pageable());
             filter_results.add(ids);
         }
@@ -81,7 +81,7 @@ public class movie_service {
 
         if (final_ids.isEmpty()) return Page.empty(criteria.pageable());
 
-        return movie_dao.findMoviesByIds(new ArrayList<>(final_ids), criteria.pageable());
+        return movie_repository.findMoviesByIds(new ArrayList<>(final_ids), criteria.pageable());
     }
 
 

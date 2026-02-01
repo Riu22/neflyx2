@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface movie_dao extends JpaRepository<movie, Integer> {
+public interface movie_repository extends JpaRepository<movie, Integer> {
 
     // Query básica - todas las películas
     @Query(value = """
