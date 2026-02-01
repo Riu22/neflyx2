@@ -36,27 +36,16 @@ public class admin_controller {
         model.addAttribute("item", item);
         model.addAttribute("entityName", entity);
 
-        if (entity.contains("movie") || entity.equals("person")) {
-            model.addAttribute("movies", admin_service.findTop100("movie"));
-            model.addAttribute("persons", admin_service.findTop100("person"));
-            model.addAttribute("allGenres", admin_service.findAll("genre"));
-            model.addAttribute("allCountries", admin_service.findAll("country"));
-            model.addAttribute("departments", admin_service.findAll("department"));
-        }
+        loadReferenceData(entity, model);
+
         return getTemplateForEntity(entity);
     }
 
-    @PostMapping("/save/movie")
-    public String saveMovie(@ModelAttribute("item") movie m) { return saveAndRedirect("movie", m); }
-
-    @PostMapping("/save/person")
-    public String savePerson(@ModelAttribute("item") person p) { return saveAndRedirect("person", p); }
-
-    @PostMapping("/movie_cast/save")
-    public String saveCast(@ModelAttribute("item") movie_cast c) { return saveAndRedirect("movie_cast", c); }
-
-    @PostMapping("/movie_crew/save")
-    public String saveCrew(@ModelAttribute("item") movie_crew c) { return saveAndRedirect("movie_crew", c); }
+    @PostMapping("/save/{entity}")
+    public String save(@PathVariable String entity, @ModelAttribute("item") Object data) {
+        admin_service.save(entity, data);
+        return "redirect:/admin/list/" + entity;
+    }
 
     @GetMapping("/delete/{entity}/{id}")
     public String delete(@PathVariable String entity, @PathVariable String id) {
@@ -65,9 +54,24 @@ public class admin_controller {
         return "redirect:/admin/list/" + entity;
     }
 
-    private String saveAndRedirect(String entity, Object data) {
-        admin_service.save(entity, data);
-        return "redirect:/admin/list/" + entity;
+    // Método auxiliar para cargar datos de referencia
+    private void loadReferenceData(String entity, Model model) {
+        switch (entity.toLowerCase()) {
+            case "movie_cast":
+                model.addAttribute("movies", admin_service.findTop100("movie"));
+                model.addAttribute("persons", admin_service.findTop100("person"));
+                model.addAttribute("genders", admin_service.findAll("gender"));
+                break;
+            case "movie_crew":
+                model.addAttribute("movies", admin_service.findTop100("movie"));
+                model.addAttribute("persons", admin_service.findTop100("person"));
+                model.addAttribute("departments", admin_service.findAll("department"));
+                break;
+            case "movie":
+                model.addAttribute("allGenres", admin_service.findAll("genre"));
+                model.addAttribute("allCountries", admin_service.findAll("country"));
+                break;
+        }
     }
 
     private String getTemplateForEntity(String entity) {
@@ -78,6 +82,10 @@ public class admin_controller {
             case "country" -> "country-form";
             case "movie_cast" -> "movie-cast-form";
             case "movie_crew" -> "movie-crew-form";
+            case "keyword" -> "keyword-form";
+            case "department" -> "department-form";
+            case "language" -> "language-form";
+            case "language_role" -> "language-role-form";
             default -> "dashboard";
         };
     }

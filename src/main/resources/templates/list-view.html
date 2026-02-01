@@ -93,6 +93,31 @@
 
         .edit-link { color: #007bff; }
         .delete-link { color: var(--primary); }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .pagination a, .pagination span {
+            padding: 8px 12px;
+            background: var(--surface);
+            border-radius: 4px;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .pagination a:hover {
+            background: var(--primary);
+        }
+
+        .pagination .current {
+            background: var(--primary);
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -102,11 +127,7 @@
         <h2 th:text="'Gestión de ' + ${entityName}">Entidad</h2>
         <div>
             <a href="/admin/dashboard" class="btn btn-back">⬅ Volver</a>
-
-            <a th:if="${entityName == 'movie_cast'}" th:href="@{/admin/movie_cast/new}" class="btn btn-add">+ Nuevo Reparto</a>
-            <a th:if="${entityName == 'movie_crew'}" th:href="@{/admin/movie_crew/new}" class="btn btn-add">+ Nuevo Crew</a>
-            <a th:if="${entityName != 'movie_cast' && entityName != 'movie_crew'}"
-               th:href="@{/admin/edit/{e}/0(e=${entityName})}" class="btn btn-add">+ Añadir Registro</a>
+            <a th:href="@{/admin/edit/{e}/0(e=${entityName})}" class="btn btn-add">+ Añadir Registro</a>
         </div>
     </div>
 
@@ -121,7 +142,6 @@
         </thead>
         <tbody>
         <tr th:each="obj : ${items}">
-
             <td>
                 <span class="badge" th:text="${obj.id}">ID</span>
             </td>
@@ -140,11 +160,29 @@
 
                 <a th:href="@{/admin/delete/{e}/{id}(e=${entityName}, id=${obj.id})}"
                    class="delete-link" title="Borrar"
-                   onclick="return confirm('¿Eliminar registro?')">🗑️</a>
+                   onclick="return confirm('¿Eliminar este registro?')">🗑️</a>
             </td>
         </tr>
         </tbody>
     </table>
+
+    <div class="pagination" th:if="${totalPages > 1}">
+        <a th:if="${currentPage > 0}"
+           th:href="@{/admin/list/{e}(e=${entityName}, page=${currentPage - 1})}">
+            ← Anterior
+        </a>
+
+        <span th:if="${currentPage == 0}" style="opacity: 0.5;">← Anterior</span>
+
+        <span class="current" th:text="'Página ' + ${currentPage + 1} + ' de ' + ${totalPages}"></span>
+
+        <a th:if="${currentPage + 1 < totalPages}"
+           th:href="@{/admin/list/{e}(e=${entityName}, page=${currentPage + 1})}">
+            Siguiente →
+        </a>
+
+        <span th:if="${currentPage + 1 >= totalPages}" style="opacity: 0.5;">Siguiente →</span>
+    </div>
 </div>
 
 </body>

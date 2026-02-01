@@ -76,27 +76,42 @@
 
     <form th:action="@{/admin/movie_crew/save}" th:object="${item}" method="post">
 
+        <!-- Si tienes un ID para edición, inclúyelo como hidden -->
+        <input type="hidden" th:field="*{id}" th:if="${item.id != null}">
+
         <div class="form-group">
             <label>Película:</label>
-            <select th:field="*{movie.movie_id}" class="filter-select" required>
+            <select th:field="*{movie}" class="filter-select" required>
                 <option value="">Selecciona una película...</option>
-                <option th:each="m : ${movies}" th:value="${m.movie_id}" th:text="${m.title}"></option>
+                <option th:each="m : ${movies}"
+                        th:value="${m.movie_id}"
+                        th:text="${m.title}"
+                        th:selected="${item.movie != null && item.movie.movie_id == m.movie_id}">
+                </option>
             </select>
         </div>
 
         <div class="form-group">
             <label>Trabajador (Persona):</label>
-            <select th:field="*{person.person_id}" class="filter-select" required>
+            <select th:field="*{person}" class="filter-select" required>
                 <option value="">Selecciona una persona...</option>
-                <option th:each="p : ${persons}" th:value="${p.person_id}" th:text="${p.person_name}"></option>
+                <option th:each="p : ${persons}"
+                        th:value="${p.person_id}"
+                        th:text="${p.person_name}"
+                        th:selected="${item.person != null && item.person.person_id == p.person_id}">
+                </option>
             </select>
         </div>
 
         <div class="form-group">
             <label>Departamento:</label>
-            <select th:field="*{department.department_id}" class="filter-select" required>
+            <select th:field="*{department}" class="filter-select" required>
                 <option value="">Selecciona departamento (Directing, Art, etc.)</option>
-                <option th:each="d : ${departments}" th:value="${d.department_id}" th:text="${d.department_name}"></option>
+                <option th:each="d : ${departments}"
+                        th:value="${d.department_id}"
+                        th:text="${d.department_name}"
+                        th:selected="${item.department != null && item.department.department_id == d.department_id}">
+                </option>
             </select>
         </div>
 

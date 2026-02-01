@@ -29,9 +29,14 @@ public class admin_service {
             case person p -> new EntityDTO(String.valueOf(p.getPerson_id()), p.getPerson_name(), "ID: " + p.getPerson_id());
             case genre g -> new EntityDTO(String.valueOf(g.getGenre_id()), g.getGenre_name(), "Género");
             case country c -> new EntityDTO(String.valueOf(c.getCountry_id()), c.getCountry_name(), "ISO: " + c.getCountry_iso_code());
-            case movie_cast mc -> new EntityDTO(String.valueOf(mc.getMovie().getMovie_id()),
+            case keyword k -> new EntityDTO(String.valueOf(k.getKeyword_id()), k.getKeyword_name(), "🏷️ Palabra clave");
+            case department d -> new EntityDTO(String.valueOf(d.getDepartment_id()), d.getDepartment_name(), "🏢 Departamento");
+            case language l -> new EntityDTO(String.valueOf(l.getLanguage_id()), l.getLanguage_name(), "🌐 " + l.getLanguage_code());
+            case language_role lr -> new EntityDTO(String.valueOf(lr.getRole_id()), lr.getLanguage_role(), "📋 Rol de idioma");
+            case gender gnd -> new EntityDTO(String.valueOf(gnd.getGender_id()), gnd.getGender(), "⚧ Género");
+            case movie_cast mc -> new EntityDTO(String.valueOf(mc.getId()),
                     mc.getMovie().getTitle() + " ➔ " + mc.getPerson().getPerson_name(), "🎭 " + mc.getCharacter_name());
-            case movie_crew mcr -> new EntityDTO(String.valueOf(mcr.getMovie().getMovie_id()),
+            case movie_crew mcr -> new EntityDTO(String.valueOf(mcr.getId()),
                     mcr.getMovie().getTitle() + " ➔ " + mcr.getPerson().getPerson_name(), "🛠️ " + mcr.getJob());
             default -> new EntityDTO("0", "Desconocido", "N/A");
         };
@@ -45,6 +50,11 @@ public class admin_service {
             case "country" -> new country();
             case "movie_cast" -> new movie_cast();
             case "movie_crew" -> new movie_crew();
+            case "keyword" -> new keyword();
+            case "department" -> new department();
+            case "language" -> new language();
+            case "language_role" -> new language_role();
+            case "gender" -> new gender();
             default -> throw new IllegalArgumentException("Entidad no reconocida: " + entity);
         };
     }
