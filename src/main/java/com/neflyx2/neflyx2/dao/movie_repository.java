@@ -16,7 +16,6 @@ import java.util.Optional;
 @Repository
 public interface movie_repository extends JpaRepository<movie, Integer> {
 
-    // Query básica - todas las películas
     @Query(value = """
         SELECT 
             m.movie_id AS movieId, 
@@ -35,17 +34,14 @@ public interface movie_repository extends JpaRepository<movie, Integer> {
             nativeQuery = true)
     Page<MovieListDTO> findAllMovies(Pageable pageable);
 
-    // Query por título - devuelve IDs
     @Query(value = "SELECT movie_id FROM movie WHERE title LIKE CONCAT('%', :title, '%')",
             nativeQuery = true)
     List<Integer> findIdsByTitle(@Param("title") String title);
 
-    // Query por año - devuelve IDs
     @Query(value = "SELECT movie_id FROM movie WHERE YEAR(release_date) = :year",
             nativeQuery = true)
     List<Integer> findIdsByYear(@Param("year") Integer year);
 
-    // Query por género - devuelve IDs
     @Query(value = """
         SELECT DISTINCT m.movie_id 
         FROM movie m 
@@ -56,7 +52,6 @@ public interface movie_repository extends JpaRepository<movie, Integer> {
             nativeQuery = true)
     List<Integer> findIdsByGenre(@Param("genreName") String genreName);
 
-    // Query por director - devuelve IDs
     @Query(value = """
     SELECT DISTINCT m.movie_id 
     FROM movie m 
@@ -76,7 +71,6 @@ public interface movie_repository extends JpaRepository<movie, Integer> {
     """, nativeQuery = true)
     List<Integer> findIdsByActor(@Param("actor") String actor);
 
-    // Query final - devuelve películas completas por IDs
     @Query(value = """
         SELECT 
             m.movie_id AS movieId, 

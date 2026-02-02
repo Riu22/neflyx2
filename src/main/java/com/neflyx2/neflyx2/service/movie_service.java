@@ -23,8 +23,7 @@ public class movie_service {
     public Page<MovieListDTO> get_filtered_movies(String title, Integer year, String genre,
                                                   String actor, String director, String character, int page, int size) {
 
-        // CORRECCIÓN: El orden debe coincidir EXACTAMENTE con el Record:
-        // title, year, genre, director, actor, character
+
         MovieSearchCriteria criteria = new MovieSearchCriteria(
                 title, year, genre, director, actor, character, PageRequest.of(page, size)
         );
@@ -40,10 +39,9 @@ public class movie_service {
 
         List<Set<Integer>> filter_results = new ArrayList<>();
 
-        // Función auxiliar para no repetir código y validar si el filtro vacía el resultado
         if (criteria.has_title()) {
             Set<Integer> ids = new HashSet<>(movie_repository.findIdsByTitle(criteria.title()));
-            if (ids.isEmpty()) return Page.empty(criteria.pageable()); // Si un filtro da 0, el total es 0
+            if (ids.isEmpty()) return Page.empty(criteria.pageable());
             filter_results.add(ids);
         }
 
@@ -90,10 +88,8 @@ public class movie_service {
             return new HashSet<>();
         }
 
-        // Empezar con el primer set
         Set<Integer> result = new HashSet<>(sets.get(0));
 
-        // Hacer intersección con cada set restante
         for (int i = 1; i < sets.size(); i++) {
             result.retainAll(sets.get(i));
         }
