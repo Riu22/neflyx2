@@ -16,7 +16,7 @@ public class language {
     String language_name;
 
     @OneToMany(mappedBy = "language")
-    List<movie_language> movie_languages;
+    List<movie_languages> movie_languages;
 
     public Integer getLanguage_id() {
         return language_id;
@@ -42,11 +42,11 @@ public class language {
         this.language_name = language_name;
     }
 
-    public List<movie_language> getMovie_languages() {
+    public List<movie_languages> getMovie_languages() {
         return movie_languages;
     }
 
-    public void setMovie_languages(List<movie_language> movie_languages) {
+    public void setMovie_languages(List<movie_languages> movie_languages) {
         this.movie_languages = movie_languages;
     }
 }

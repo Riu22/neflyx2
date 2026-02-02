@@ -4,10 +4,10 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "movie_languages")
-public class movie_language {
+public class movie_languages {
 
     @EmbeddedId
-    movie_language_id id;
+    movie_languages_id id;
 
     @ManyToOne
     @MapsId("movie_id")
@@ -24,11 +24,11 @@ public class movie_language {
     @JoinColumn(name = "language_role_id")
     private language_role language_role;
 
-    public movie_language_id getId() {
+    public movie_languages_id getId() {
         return id;
     }
 
-    public void setId(movie_language_id id) {
+    public void setId(movie_languages_id id) {
         this.id = id;
     }
 

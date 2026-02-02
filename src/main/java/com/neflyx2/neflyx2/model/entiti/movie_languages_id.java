@@ -5,14 +5,14 @@ import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 @Embeddable
-public class movie_language_id implements Serializable {
+public class movie_languages_id implements Serializable {
     Integer movie_id;
     Integer language_id;
     Integer language_role_id;
 
-    public movie_language_id() {}
+    public movie_languages_id() {}
 
-    public movie_language_id(Integer movie_id, Integer language_id, Integer language_role_id) {
+    public movie_languages_id(Integer movie_id, Integer language_id, Integer language_role_id) {
         this.movie_id = movie_id;
         this.language_id = language_id;
         this.language_role_id = language_role_id;
@@ -21,7 +21,7 @@ public class movie_language_id implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof movie_language_id that)) return false;
+        if (!(o instanceof movie_languages_id that)) return false;
         return Objects.equals(movie_id, that.movie_id) &&
                 Objects.equals(language_id, that.language_id) &&
                 Objects.equals(language_role_id, that.language_role_id);

@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -13,39 +11,48 @@ public class movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer movie_id;
+
     @Column(length = 1000)
     String title;
+
     Integer budget;
+
     @Column(length = 1000)
     String homepage;
+
     @Column(length = 1000)
     String overview;
-    @Column(precision = 12,scale = 6)
+
+    @Column(precision = 12, scale = 6)
     BigDecimal popularity;
+
     @Column(name = "release_date")
     LocalDate release_date;
 
     Long revenue;
 
     Integer runtime;
+
     @Column(length = 50)
     String movie_status;
+
     @Column(length = 1000)
     String tagline;
-    @Column(precision = 4,scale = 2)
+
+    @Column(precision = 4, scale = 2)
     BigDecimal vote_average;
 
     Integer vote_count;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
-            name ="production_country",
+            name = "production_country",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "country_id")
     )
     Set<country> countries;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "movie_genres",
             joinColumns = @JoinColumn(name = "movie_id"),
@@ -53,7 +60,7 @@ public class movie {
     )
     Set<genre> genres;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "movie_keywords",
             joinColumns = @JoinColumn(name = "movie_id"),
@@ -61,7 +68,7 @@ public class movie {
     )
     Set<keyword> keywords;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "movie_company",
             joinColumns = @JoinColumn(name = "movie_id"),
@@ -69,11 +76,14 @@ public class movie {
     )
     Set<production_company> production_companies;
 
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<movie_cast> cast;
 
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<movie_crew> crew;
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<movie_languages> languages;
 
     public Integer getMovie_id() {
         return movie_id;
@@ -225,5 +235,13 @@ public class movie {
 
     public void setCrew(Set<movie_crew> crew) {
         this.crew = crew;
+    }
+
+    public Set<movie_languages> getLanguages() {
+        return languages;
+    }
+
+    public void setLanguages(Set<movie_languages> languages) {
+        this.languages = languages;
     }
 }

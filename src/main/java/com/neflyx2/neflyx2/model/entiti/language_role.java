@@ -13,7 +13,7 @@ public class language_role {
     String language_role;
 
     @OneToMany(mappedBy = "language_role")
-    List<movie_language> movie_languages_rol;
+    List<movie_languages> movie_languages_rol;
 
     public Integer getRole_id() {
         return role_id;
@@ -31,11 +31,11 @@ public class language_role {
         this.language_role = language_role;
     }
 
-    public List<movie_language> getMovie_languages_rol() {
+    public List<movie_languages> getMovie_languages_rol() {
         return movie_languages_rol;
     }
 
-    public void setMovie_languages_rol(List<movie_language> movie_languages_rol) {
+    public void setMovie_languages_rol(List<movie_languages> movie_languages_rol) {
         this.movie_languages_rol = movie_languages_rol;
     }
 }

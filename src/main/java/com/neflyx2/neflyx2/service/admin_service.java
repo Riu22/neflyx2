@@ -25,19 +25,63 @@ public class admin_service {
 
     private EntityDTO convertToDTO(Object obj) {
         return switch (obj) {
-            case movie m -> new EntityDTO(String.valueOf(m.getMovie_id()), m.getTitle(), "⭐ Pop: " + m.getPopularity());
-            case person p -> new EntityDTO(String.valueOf(p.getPerson_id()), p.getPerson_name(), "ID: " + p.getPerson_id());
-            case genre g -> new EntityDTO(String.valueOf(g.getGenre_id()), g.getGenre_name(), "Género");
-            case country c -> new EntityDTO(String.valueOf(c.getCountry_id()), c.getCountry_name(), "ISO: " + c.getCountry_iso_code());
-            case keyword k -> new EntityDTO(String.valueOf(k.getKeyword_id()), k.getKeyword_name(), "🏷️ Palabra clave");
-            case department d -> new EntityDTO(String.valueOf(d.getDepartment_id()), d.getDepartment_name(), "🏢 Departamento");
-            case language l -> new EntityDTO(String.valueOf(l.getLanguage_id()), l.getLanguage_name(), "🌐 " + l.getLanguage_code());
-            case language_role lr -> new EntityDTO(String.valueOf(lr.getRole_id()), lr.getLanguage_role(), "📋 Rol de idioma");
-            case gender gnd -> new EntityDTO(String.valueOf(gnd.getGender_id()), gnd.getGender(), "⚧ Género");
-            case movie_cast mc -> new EntityDTO(String.valueOf(mc.getId()),
-                    mc.getMovie().getTitle() + " ➔ " + mc.getPerson().getPerson_name(), "🎭 " + mc.getCharacter_name());
-            case movie_crew mcr -> new EntityDTO(String.valueOf(mcr.getId()),
-                    mcr.getMovie().getTitle() + " ➔ " + mcr.getPerson().getPerson_name(), "🛠️ " + mcr.getJob());
+            case movie m -> new EntityDTO(
+                    String.valueOf(m.getMovie_id()),
+                    m.getTitle(),
+                    "⭐ Pop: " + m.getPopularity()
+            );
+            case person p -> new EntityDTO(
+                    String.valueOf(p.getPerson_id()),
+                    p.getPerson_name(),
+                    "ID: " + p.getPerson_id()
+            );
+            case genre g -> new EntityDTO(
+                    String.valueOf(g.getGenre_id()),
+                    g.getGenre_name(),
+                    "Género"
+            );
+            case country c -> new EntityDTO(
+                    String.valueOf(c.getCountry_id()),
+                    c.getCountry_name(),
+                    "ISO: " + c.getCountry_iso_code()
+            );
+            case keyword k -> new EntityDTO(
+                    String.valueOf(k.getKeyword_id()),
+                    k.getKeyword_name(),
+                    "🏷️ Palabra clave"
+            );
+            case department d -> new EntityDTO(
+                    String.valueOf(d.getDepartment_id()),
+                    d.getDepartment_name(),
+                    "🏢 Departamento"
+            );
+            case language l -> new EntityDTO(
+                    String.valueOf(l.getLanguage_id()),
+                    l.getLanguage_name(),
+                    "🌐 " + l.getLanguage_code()
+            );
+            case language_role lr -> new EntityDTO(
+                    String.valueOf(lr.getRole_id()),
+                    lr.getLanguage_role(),
+                    "📋 Rol de idioma"
+            );
+            case gender gnd -> new EntityDTO(
+                    String.valueOf(gnd.getGender_id()),
+                    gnd.getGender(),
+                    "⚧ Género"
+            );
+            case movie_cast mc -> new EntityDTO(
+                    mc.getId().getMovie_id() + "-" + mc.getId().getPerson_id() + "-" +
+                            (mc.getId().getGender_id() != null ? mc.getId().getGender_id() : "0"),
+                    mc.getMovie().getTitle() + " ➔ " + mc.getPerson().getPerson_name(),
+                    "🎭 " + (mc.getCharacter_name() != null ? mc.getCharacter_name() : "Sin personaje")
+            );
+            case movie_crew mcr -> new EntityDTO(
+                    mcr.getId().getMovie_id() + "-" + mcr.getId().getPerson_id() + "-" +
+                            (mcr.getId().getDepartment_id() != null ? mcr.getId().getDepartment_id() : "0"),
+                    mcr.getMovie().getTitle() + " ➔ " + mcr.getPerson().getPerson_name(),
+                    "🛠️ " + (mcr.getJob() != null ? mcr.getJob() : "Sin especificar")
+            );
             default -> new EntityDTO("0", "Desconocido", "N/A");
         };
     }
@@ -74,7 +118,10 @@ public class admin_service {
     }
 
     public List<Object> findTop100(String entity) {
-        return getRepo(entity).findAll(PageRequest.of(0, 100)).getContent().stream().map(o -> (Object)o).toList();
+        return getRepo(entity).findAll(PageRequest.of(0, 100)).getContent()
+                .stream()
+                .map(o -> (Object)o)
+                .toList();
     }
 
     public List<?> findAll(String entity) {
