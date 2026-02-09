@@ -39,4 +39,14 @@ public class production_company {
     public void setMovies(List<movie> movies) {
         this.movies = movies;
     }
+
+    @PreRemove
+    private void remove() {
+        if (movies != null) {
+            for (movie m : movies) {
+                m.getGenres().remove(this);
+            }
+        }
+    }
+
 }

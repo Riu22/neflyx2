@@ -1,15 +1,22 @@
-# 1. Usamos una imagen base con Java 21 que sea ligera (alpine)
-FROM eclipse-temurin:21-jre-alpine
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
 
-# 2. Creamos una carpeta de trabajo dentro del contenedor
 WORKDIR /app
 
-# 3. Copiamos el archivo JAR que ya tienes en 'target' al contenedor
-# Lo renombramos a 'app.jar' para que sea más fácil de manejar
-COPY target/neflyx2-0.0.1-SNAPSHOT.jar app.jar
+COPY pom.xml .
 
-# 4. Exponemos el puerto 8080 (el que usa Spring Boot por defecto)
+RUN mvn dependency:go-offline
+
+COPY src ./src
+
+RUN mvn clean package -DskipTests
+
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+COPY --from=build /app/target/neflyx2-0.0.1-SNAPSHOT.jar app.jar
+
 EXPOSE 8080
 
-# 5. Comando para ejecutar la aplicación al iniciar el contenedor
+
 ENTRYPOINT ["java", "-jar", "app.jar"]

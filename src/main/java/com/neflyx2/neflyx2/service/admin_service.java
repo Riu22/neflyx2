@@ -103,8 +103,21 @@ public class admin_service {
         };
     }
 
+    @Transactional(readOnly = true)
     public Object findById(String entity, Object id) {
-        return getRepo(entity).findById(id).orElse(null);
+        Object result = getRepo(entity).findById(id).orElse(null);
+
+        if (result instanceof movie_cast mc) {
+            if (mc.getMovie() != null) mc.getMovie().getTitle();
+            if (mc.getPerson() != null) mc.getPerson().getPerson_name();
+            if (mc.getGender() != null) mc.getGender().getGender();
+        } else if (result instanceof movie_crew mcr) {
+            if (mcr.getMovie() != null) mcr.getMovie().getTitle();
+            if (mcr.getPerson() != null) mcr.getPerson().getPerson_name();
+            if (mcr.getDepartment() != null) mcr.getDepartment().getDepartment_name();
+        }
+
+        return result;
     }
 
     @Transactional
@@ -131,7 +144,7 @@ public class admin_service {
     @SuppressWarnings("unchecked")
     private JpaRepository<Object, Object> getRepo(String entity) {
         String name = entity.toLowerCase() + "_repository";
-        JpaRepository<Object, Object> repo = (JpaRepository<Object, Object>) repositories.get(name);
+        JpaRepository<Object, Object> repo = (JpaRepository<Object, Object>) repositories.get(entity.toLowerCase() + "_repository");
         if (repo == null) throw new RuntimeException("Repositorio no encontrado: " + name);
         return repo;
     }

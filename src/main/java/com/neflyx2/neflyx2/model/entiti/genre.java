@@ -38,4 +38,13 @@ public class genre {
 
     @ManyToMany(mappedBy = "genres")
     List<movie> movies;
+
+    @PreRemove
+    private void remove() {
+        if (movies != null) {
+            for (movie m : movies) {
+                m.getGenres().remove(this);
+            }
+        }
+    }
 }

@@ -100,15 +100,37 @@ public class admin_controller {
     }
 
     @PostMapping("/save/movie_cast")
-    public String saveMovieCast(@ModelAttribute("item") movie_cast mc) {
-        if (mc.getId() == null) {
-            movie_cast_id id = new movie_cast_id(
-                    mc.getMovie().getMovie_id(),
-                    mc.getPerson().getPerson_id(),
-                    mc.getGender() != null ? mc.getGender().getGender_id() : null
-            );
-            mc.setId(id);
+    public String saveMovieCast(
+            @RequestParam("movie.movie_id") Integer movieId,
+            @RequestParam("person.person_id") Integer personId,
+            @RequestParam(value = "gender.gender_id", required = false) Integer genderId,
+            @RequestParam("character_name") String characterName) {
+
+        movie_cast mc = new movie_cast();
+
+        // Crear y asignar movie
+        movie m = new movie();
+        m.setMovie_id(movieId);
+        mc.setMovie(m);
+
+        // Crear y asignar person
+        person p = new person();
+        p.setPerson_id(personId);
+        mc.setPerson(p);
+
+        // Crear y asignar gender si existe
+        if (genderId != null && genderId > 0) {
+            gender g = new gender();
+            g.setGender_id(genderId);
+            mc.setGender(g);
         }
+
+        mc.setCharacter_name(characterName);
+
+        // Crear el ID compuesto
+        movie_cast_id id = new movie_cast_id(movieId, personId, genderId);
+        mc.setId(id);
+
         admin_service.save("movie_cast", mc);
         return "redirect:/admin/list/movie_cast";
     }

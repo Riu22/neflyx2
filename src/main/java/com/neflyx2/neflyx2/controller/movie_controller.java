@@ -35,7 +35,7 @@ public class movie_controller {
     @GetMapping("/movies/search")
     @ResponseBody
     public Page<MovieListDTO> searchMovies(
-            @RequestParam(required = false) String keyword, // title
+            @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Integer year,
             @RequestParam(required = false) String genre,
             @RequestParam(required = false) String director,

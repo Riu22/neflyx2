@@ -12,10 +12,10 @@ public class person {
     @Column(length = 500)
     String person_name;
 
-    @OneToMany(mappedBy = "person")
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<movie_cast> appearancesAsCast;
 
-    @OneToMany(mappedBy = "person")
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<movie_crew> appearancesAsCrew;
 
     public Integer getPerson_id() {

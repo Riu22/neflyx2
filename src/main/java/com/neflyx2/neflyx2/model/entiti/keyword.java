@@ -38,4 +38,12 @@ public class keyword {
     public void setMovies(List<movie> movies) {
         this.movies = movies;
     }
+    @PreRemove
+    private void removeKeywordsFromMovies() {
+        if (movies != null) {
+            for (movie m : movies) {
+                m.getKeywords().remove(this);
+            }
+        }
+    }
 }

@@ -48,4 +48,13 @@ public class country {
     public void setMovies(List<movie> movies) {
         this.movies = movies;
     }
+
+    @PreRemove
+    private void removeCountriesFromMovies() {
+        if (movies != null) {
+            for (movie m : movies) {
+                m.getCountries().remove(this);
+            }
+        }
+    }
 }
