@@ -43,7 +43,7 @@ public class movie_controller {
             @RequestParam(required = false) String character,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "24") int size) {
-
+//prueba
         return movie_service.get_filtered_movies(
                 keyword,
                 year,
