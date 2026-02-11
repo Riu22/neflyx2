@@ -1,0 +1,36 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  REGISTRY_URL: $CI_REGISTRY
+  IMAGE_NAME: $CI_REGISTRY_IMAGE/my-image
+  IMAGE_TAG: latest
+
+default:
+  image: docker:latest
+  services:
+    - name: docker:dind
+
+build-job:
+  stage: build
+  script:
+    # Cal crear un Dockerfile per poder fer el docker build i docker push posterior
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $IMAGE_NAME:$IMAGE_TAG .
+    - docker push $IMAGE_NAME:$IMAGE_TAG
+
+deploy-prod:
+  stage: deploy
+  script:
+    # Cal definir les variables SSH_PRIVATE_KEY, SSH_PORT, SSH_HOST a CI/CD Settings Variables
+    - echo "comando a ejecutar - docker login $CI_REGISTRY_USER"
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    # Comando corregido en una sola línea para evitar errores de sintaxis
+    - ssh -o StrictHostKeyChecking=no -p $SSH_PORT $SSH_HOST "echo '$CI_REGISTRY_PASSWORD' | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY && cd /root/demo-ci-front && docker compose pull && docker compose up -d"
+  environment:
+    name: production
