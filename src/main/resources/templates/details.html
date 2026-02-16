@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${movie.title} + ' - Neflyx2'">Detalles de la Película</title>
+    <title th:text="${movie != null ? movie.title + ' - Neflyx2' : 'Película no encontrada'}">Detalles de la Película</title>
     <style>
-        /* REUTILIZACIÓN DE TU CSS */
+        /* --- ESTILOS GENERALES (Mantenidos) --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Netflix Sans', 'Helvetica Neue', Arial, sans-serif;
@@ -14,6 +14,7 @@
             overflow-x: hidden;
         }
 
+        /* Navbar */
         .navbar {
             background: rgb(20, 20, 20);
             padding: 20px 4%;
@@ -24,30 +25,35 @@
             align-items: center;
             justify-content: space-between;
         }
-
         .navbar-brand {
             font-size: 2.5em;
             font-weight: 800;
-            color: #0071eb;
+            color: #0071eb; /* Azul Netflix/Neflyx */
             letter-spacing: -2px;
             text-decoration: none;
         }
 
-        /* ESTILOS ESPECÍFICOS PARA DETALLES */
+        /* --- HERO SECTION --- */
         .hero-section {
             height: 70vh;
             position: relative;
             display: flex;
             align-items: center;
             padding: 0 4%;
-            background: linear-gradient(to right, #141414 10%, rgba(20,20,20,0) 100%),
-                        linear-gradient(to top, #141414 0%, rgba(20,20,20,0) 20%);
             background-size: cover;
             background-position: center;
         }
+        /* Capa oscura para leer el texto sobre la imagen */
+        .hero-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to right, #141414 10%, rgba(20,20,20,0) 100%),
+                        linear-gradient(to top, #141414 0%, rgba(20,20,20,0) 20%);
+            z-index: 1;
+        }
 
         .hero-content {
-            max-width: 600px;
+            max-width: 700px;
             z-index: 2;
             margin-top: 80px;
         }
@@ -57,13 +63,20 @@
             font-weight: 800;
             margin-bottom: 0.2em;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            line-height: 1.1;
+        }
+
+        .tagline-text {
+            font-size: 1.3em;
+            color: #bcbcbc;
+            font-style: italic;
+            margin-bottom: 20px;
         }
 
         .hero-meta {
             display: flex;
             align-items: center;
             gap: 15px;
-            margin-bottom: 20px;
             font-size: 1.1em;
             color: #bcbcbc;
         }
@@ -73,45 +86,98 @@
             font-weight: 700;
         }
 
+        /* --- CONTENIDO PRINCIPAL --- */
         .detail-container {
             padding: 40px 4%;
             max-width: 1200px;
             margin: 0 auto;
         }
-
         .info-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 50px;
         }
 
-        .overview-text {
-            font-size: 1.2em;
-            line-height: 1.6;
-            color: #e5e5e5;
+        .section-title {
+            color: #808080;
+            margin-bottom: 15px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
         }
 
+        .overview-text {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #e5e5e5;
+            margin-bottom: 30px;
+        }
+
+        /* --- CAST (REPARTO) --- */
+        .cast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .cast-card {
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+        .cast-card:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .cast-name {
+            display: block;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 3px;
+        }
+        .cast-role {
+            display: block;
+            font-size: 0.85em;
+            color: #808080;
+        }
+
+        /* --- SIDEBAR (METADATA) --- */
         .metadata-sidebar {
             background: rgba(255,255,255,0.05);
             padding: 25px;
-            border-radius: 4px;
+            border-radius: 6px;
+            align-self: start; /* Para que no se estire */
         }
-
         .meta-item {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
-
         .meta-label {
             color: #808080;
             display: block;
-            font-size: 0.9em;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             margin-bottom: 4px;
+        }
+        .meta-value {
+            font-size: 1em;
+            color: #e5e5e5;
+        }
+        .meta-value a {
+            color: #0071eb;
+            text-decoration: none;
+        }
+        .meta-value a:hover {
+            text-decoration: underline;
         }
 
         .btn-back {
             display: inline-block;
-            margin-top: 30px;
-            padding: 12px 24px;
+            margin-top: 20px;
+            padding: 10px 20px;
             background: #333;
             color: white;
             text-decoration: none;
@@ -119,19 +185,12 @@
             font-weight: 600;
             transition: 0.2s;
         }
-
-        .btn-back:hover { background: #454545; }
-
-        .tagline-text {
-            font-size: 1.3em;
-            color: #bcbcbc;
-            font-style: italic;
-            margin-bottom: 20px;
-        }
+        .btn-back:hover { background: #555; }
 
         @media (max-width: 800px) {
             .hero-title { font-size: 2.5em; }
             .info-grid { grid-template-columns: 1fr; }
+            .hero-section { height: 60vh; }
         }
     </style>
 </head>
@@ -142,43 +201,78 @@
 </nav>
 
 <div th:if="${movie != null}">
-    <div class="hero-section" style="background-image: linear-gradient(to right, #141414 20%, rgba(20,20,20,0) 100%), url('https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=2059&auto=format&fit=crop');">
+
+    <div class="hero-section" style="background-image: url('https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=2059&auto=format&fit=crop');">
+        <div class="hero-overlay"></div>
+
         <div class="hero-content">
-            <h1 class="hero-title" th:text="${movie.title}">Título</h1>
-            <p class="tagline-text" th:text="${movie.tagline}">Tagline de la peli</p>
+            <h1 class="hero-title" th:text="${movie.title}">Título de la Película</h1>
+
+            <p class="tagline-text" th:if="${movie.tagline != null and !movie.tagline.isEmpty()}" th:text="${movie.tagline}">
+                Tagline aquí
+            </p>
+
             <div class="hero-meta">
-                <span class="rating-bold" th:text="${movie.vote_average} + ' de valoración'">8.5</span>
-                <span th:text="${#temporals.format(movie.release_date, 'yyyy')}">2024</span>
+                <span class="rating-bold" th:text="${movie.vote_average} + ' Valoración'">8.5</span>
+                <span th:text="${movie.release_date != null ? #temporals.format(movie.release_date, 'yyyy') : 'N/A'}">2024</span>
                 <span th:text="${movie.runtime} + ' min'">120 min</span>
+                <span style="border: 1px solid #bcbcbc; padding: 0 5px; font-size: 0.8em; border-radius: 2px;">HD</span>
             </div>
         </div>
     </div>
 
     <div class="detail-container">
         <div class="info-grid">
+
             <div>
-                <h3 style="color: #808080; margin-bottom: 10px;">Sinopsis</h3>
+                <h3 class="section-title">Sinopsis</h3>
                 <p class="overview-text" th:text="${movie.overview}">Resumen de la película...</p>
+
+                <div th:if="${movie.cast != null and !movie.cast.isEmpty()}">
+                    <h3 class="section-title">Reparto Principal</h3>
+                    <div class="cast-grid">
+                        <div th:each="actor : ${movie.cast}" class="cast-card">
+                            <span class="cast-name" th:text="${actor.personName}">Actor Name</span>
+                            <span class="cast-role" th:text="${actor.characterName}">Character Name</span>
+                        </div>
+                    </div>
+                </div>
 
                 <a href="/" class="btn-back">← Volver al listado</a>
             </div>
 
             <div class="metadata-sidebar">
+
                 <div class="meta-item">
                     <span class="meta-label">Estado</span>
-                    <span th:text="${movie.movie_status}">Released</span>
+                    <span class="meta-value" th:text="${movie.movie_status}">Released</span>
                 </div>
+
+                <div class="meta-item" th:if="${movie.genres != null}">
+                    <span class="meta-label">Géneros</span>
+                    <span class="meta-value" th:text="${movie.genres}">Acción, Drama</span>
+                </div>
+
+                <div class="meta-item" th:if="${movie.directors != null}">
+                    <span class="meta-label">Dirección</span>
+                    <span class="meta-value" th:text="${movie.directors}">Director Name</span>
+                </div>
+
                 <div class="meta-item">
                     <span class="meta-label">Presupuesto</span>
-                    <span th:text="${movie.budget > 0 ? '$' + #numbers.formatDecimal(movie.budget, 0, 'COMMA', 0, 'POINT') : 'Desconocido'}">$0</span>
+                    <span class="meta-value" th:text="${movie.budget > 0 ? '$' + #numbers.formatDecimal(movie.budget, 0, 'COMMA', 0, 'POINT') : 'Desconocido'}">$0</span>
                 </div>
+
                 <div class="meta-item">
                     <span class="meta-label">Recaudación</span>
-                    <span th:text="${movie.revenue > 0 ? '$' + #numbers.formatDecimal(movie.revenue, 0, 'COMMA', 0, 'POINT') : 'Desconocido'}">$0</span>
+                    <span class="meta-value" th:text="${movie.revenue > 0 ? '$' + #numbers.formatDecimal(movie.revenue, 0, 'COMMA', 0, 'POINT') : 'Desconocido'}">$0</span>
                 </div>
+
                 <div class="meta-item" th:if="${movie.homepage != null and !movie.homepage.isEmpty()}">
-                    <span class="meta-label">Sitio Web</span>
-                    <a th:href="${movie.homepage}" target="_blank" style="color: #0071eb;">Visitar página oficial</a>
+                    <span class="meta-label">Web Oficial</span>
+                    <span class="meta-value">
+                        <a th:href="${movie.homepage}" target="_blank">Visitar sitio web</a>
+                    </span>
                 </div>
             </div>
         </div>
@@ -187,7 +281,8 @@
 
 <div th:unless="${movie != null}" style="padding: 150px 4%; text-align: center;">
     <h2>Película no encontrada</h2>
-    <a href="/" class="btn-search" style="display: inline-block; width: auto; margin-top: 20px;">Volver al inicio</a>
+    <p style="color: #bcbcbc; margin-top: 10px;">Lo sentimos, no pudimos encontrar la película que buscas.</p>
+    <a href="/" class="btn-back" style="display: inline-block;">Volver al inicio</a>
 </div>
 
 </body>

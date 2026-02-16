@@ -22,16 +22,20 @@
         .container {
             max-width: 800px;
             margin: 0 auto;
+        }
+
+        .card {
             background: var(--surface);
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            margin-bottom: 25px;
         }
 
         h2 { border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 25px; }
+        h3 { color: var(--primary); font-size: 13px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 15px; }
 
         .form-group { margin-bottom: 15px; }
-
         label { display: block; margin-bottom: 5px; color: #b3b3b3; font-size: 14px; }
 
         .filter-input, .filter-select {
@@ -43,7 +47,8 @@
             box-sizing: border-box;
         }
 
-        /* Estilo para los Checkboxes de Géneros */
+        .filter-input:focus { outline: none; border-color: var(--primary); }
+
         .genres-container {
             background: #111;
             padding: 15px;
@@ -56,80 +61,181 @@
             overflow-y: auto;
         }
 
-        .genre-item {
-            display: flex;
-            align-items: center;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
+        .genre-item { display: flex; align-items: center; font-size: 14px; cursor: pointer; }
         .genre-item input { margin-right: 8px; accent-color: var(--primary); }
 
-        .btn-search {
+        .btn-primary {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 12px;
+            padding: 12px 20px;
             font-weight: bold;
             cursor: pointer;
             border-radius: 4px;
             transition: 0.3s;
+            display: inline-block;
+            text-decoration: none;
+            font-size: 14px;
         }
 
-        .btn-search:hover { opacity: 0.8; }
+        .btn-primary:hover { opacity: 0.8; }
+
+        /* ========== QUICK ACTIONS ========== */
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .quick-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .quick-btn:hover { transform: translateY(-2px); opacity: 0.85; }
+        .quick-btn.actor    { background: #1a3a5c; border: 1px solid #2a5a8c; color: #6ab4ff; }
+        .quick-btn.director { background: #3a1a1a; border: 1px solid #6a2a2a; color: #ff8080; }
+        .quick-btn.list     { background: #1a3a1a; border: 1px solid #2a6a2a; color: #80ff80; }
+        .quick-btn.person   { background: #2a2a1a; border: 1px solid #5a5a1a; color: #ffff80; }
+
+        /* ========== TOAST AUTOGUARDADO ========== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1a3a1a;
+            border: 1px solid #2a6a2a;
+            color: #80ff80;
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 9999;
+            display: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to   { transform: translateX(0); opacity: 1; }
+        }
     </style>
 </head>
 <body>
 
+<!-- ========== TOAST ========== -->
+<div class="toast" id="toast">✅ Película guardada, redirigiendo...</div>
+
 <div class="container">
-    <h2 th:text="${item == null ? 'Nueva Película' : 'Editar Película'}"></h2>
+    <div class="card">
+        <h2 th:text="${item.movie_id != null && item.movie_id != 0 ? 'Editar: ' + item.title : '➕ Nueva Película'}"></h2>
 
-    <form th:action="@{/admin/save/movie}" th:object="${item}" method="post">
+        <!-- ✅ ACCIONES RÁPIDAS CON AUTOGUARDADO -->
+        <div style="margin-bottom: 25px;">
+            <h3>⚡ Acciones rápidas</h3>
+            <div class="quick-actions-grid">
 
-        <input type="hidden" th:field="*{movie_id}">
+                <!-- Botones que autoguardan y redirigen -->
+                <button type="button" onclick="autoSaveAndGo('/admin/edit/movie_cast/0')"
+                        class="quick-btn actor">
+                    🎭 Añadir Actor
+                </button>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div class="form-group">
-                <label>Título:</label>
-                <input type="text" th:field="*{title}" class="filter-input" style="width: 100%;" required>
-            </div>
-            <div class="form-group">
-                <label>Estado:</label>
-                <input type="text" th:field="*{movie_status}" class="filter-input" style="width: 100%;">
-            </div>
-            <div class="form-group">
-                <label>Presupuesto ($):</label>
-                <input type="number" th:field="*{budget}" class="filter-input" style="width: 100%;">
-            </div>
-            <div class="form-group">
-                <label>Fecha Estreno:</label>
-                <input type="date" th:field="*{release_date}" class="filter-input" style="width: 100%;">
+                <button type="button" onclick="autoSaveAndGo('/admin/edit/movie_crew/0')"
+                        class="quick-btn director">
+                    🎬 Añadir Director
+                </button>
+
+                <button type="button" onclick="autoSaveAndGo('/admin/list/movie_cast')"
+                        class="quick-btn list">
+                    📋 Ver Reparto
+                </button>
+
+                <a href="/admin/edit/person/0" class="quick-btn person">
+                    👤 Nueva Persona
+                </a>
             </div>
         </div>
 
-        <div class="form-group">
-            <label>Sinopsis:</label>
-            <textarea th:field="*{overview}" class="filter-input" style="width: 100%; height: 80px;"></textarea>
-        </div>
+        <!-- ========== FORMULARIO ========== -->
+        <form id="movieForm" th:action="@{/admin/save/movie}" th:object="${item}" method="post">
 
-        <div class="form-group">
-            <label style="color: var(--primary); font-weight: bold;">Géneros:</label>
-            <div class="genres-container">
-                <div th:each="g : ${allGenres}" class="genre-item">
-                    <input type="checkbox"
-                           th:field="*{genres}"
-                           th:value="${g.genre_id}">
-                    <span th:text="${g.genre_name}"></span>
+            <input type="hidden" th:field="*{movie_id}" id="hiddenMovieId">
+            <!-- ✅ Campo oculto para saber a dónde redirigir tras guardar -->
+            <input type="hidden" name="redirectTo" id="redirectTo" value="">
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label>Título:</label>
+                    <input type="text" th:field="*{title}" class="filter-input" style="width: 100%;" required>
+                </div>
+                <div class="form-group">
+                    <label>Estado:</label>
+                    <input type="text" th:field="*{movie_status}" class="filter-input" style="width: 100%;">
+                </div>
+                <div class="form-group">
+                    <label>Presupuesto ($):</label>
+                    <input type="number" th:field="*{budget}" class="filter-input" style="width: 100%;">
+                </div>
+                <div class="form-group">
+                    <label>Fecha Estreno:</label>
+                    <input type="date" th:field="*{release_date}" class="filter-input" style="width: 100%;">
                 </div>
             </div>
-        </div>
 
-        <div style="margin-top: 25px; display: flex; gap: 10px;">
-            <button type="submit" class="btn-search" style="flex: 2;">💾 Guardar Película</button>
-            <a href="/admin/list/movie" class="btn-search" style="background:#444; flex: 1; text-align:center; text-decoration:none;">❌ Cancelar</a>
-        </div>
-    </form>
+            <div class="form-group">
+                <label>Sinopsis:</label>
+                <textarea th:field="*{overview}" class="filter-input" style="width: 100%; height: 80px;"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label style="color: var(--primary); font-weight: bold;">Géneros:</label>
+                <div class="genres-container">
+                    <div th:each="g : ${allGenres}" class="genre-item">
+                        <input type="checkbox" th:field="*{genres}" th:value="${g.genre_id}">
+                        <span th:text="${g.genre_name}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 25px; display: flex; gap: 10px;">
+                <button type="submit" class="btn-primary" style="flex: 2;">💾 Guardar Película</button>
+                <a href="/admin/list/movie" class="btn-primary"
+                   style="background:#444; flex: 1; text-align:center;">❌ Cancelar</a>
+            </div>
+        </form>
+    </div>
 </div>
 
+<script>
+    function autoSaveAndGo(destination) {
+     const movieId = document.getElementById('hiddenMovieId').value;
+     let finalDest = destination;
+
+     // Si tenemos un ID de película, lo pasamos como parámetro ?movieId=...
+     if (movieId && movieId !== "0") {
+         // Verificamos si la URL ya tiene parámetros para usar ? o &
+         finalDest += (finalDest.includes('?') ? '&' : '?') + 'movieId=' + movieId;
+     }
+
+     const toast = document.getElementById('toast');
+     toast.style.display = 'block';
+
+     document.getElementById('redirectTo').value = finalDest;
+     document.getElementById('movieForm').submit();
+ }
+</script>
 </body>
 </html>

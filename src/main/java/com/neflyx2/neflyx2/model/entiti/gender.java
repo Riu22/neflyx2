@@ -18,10 +18,9 @@ public class gender {
         this.gender_id = gender_id;
     }
 
-    public String getGenre_name() {
+    public String getGender_name() {
         return gender;
     }
-
     public String getGender() {
         return gender;
     }

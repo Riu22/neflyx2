@@ -46,6 +46,14 @@ public class language {
         return movie_languages;
     }
 
+    public String getMainInfo() {
+        return language_name;
+    }
+
+    public String getSecondaryInfo() {
+        return language_code;
+    }
+
     public void setMovie_languages(List<movie_languages> movie_languages) {
         this.movie_languages = movie_languages;
     }

@@ -18,10 +18,11 @@ public class user_controller {
     public String login() {
         return "login";
     }
+
     @PostMapping("/login")
     public String login(@RequestParam String username, @RequestParam String password, Model model, HttpSession session) {
         boolean success = user_service.login(username, password);
-        if (success){
+        if (success) {
             session.setAttribute("username", username);
             return "redirect:/";
         }
@@ -33,11 +34,18 @@ public class user_controller {
     public String register() {
         return "register";
     }
+
     @PostMapping("/register")
     public String register(@RequestParam String username, @RequestParam String password, @RequestParam String email, Model model) {
-        user_service.register(username, password, email);
+        boolean success = user_service.register(username, password, email);
+        if (success) {
+            model.addAttribute("success", "Usuario creado correctamente. Ya puedes iniciar sesión.");
             return "login";
+        }
+        model.addAttribute("error", "El nombre de usuario '" + username + "' ya está en uso.");
+        return "register";
     }
+
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();

@@ -38,6 +38,15 @@ public class keyword {
     public void setMovies(List<movie> movies) {
         this.movies = movies;
     }
+
+    public String getMainInfo() {
+        return keyword_name;
+    }
+
+    public String getSecondaryInfo() {
+        return (movies != null) ? movies.size() + " películas" : "0 películas";
+    }
+
     @PreRemove
     private void removeKeywordsFromMovies() {
         if (movies != null) {

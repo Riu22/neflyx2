@@ -20,9 +20,14 @@ public class user_service {
         }
         return false;
     }
-    public void register(String username, String password, String email) {
+
+    public boolean register(String username, String password, String email) {
+        if (user_dao.findByUsername(username) != null) {
+            return false;
+        }
         String encript = bcrypter.hasher(password);
         user user = new user(username, encript, email);
         user_dao.save(user);
+        return true;
     }
 }

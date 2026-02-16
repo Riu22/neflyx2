@@ -111,6 +111,9 @@
 <div class="login-container">
     <h1>Iniciar sesión</h1>
 
+    <div th:if="${success}" style="color: #4caf50; margin-bottom: 15px;" th:text="${success}"></div>
+    <div th:if="${error}" style="color: #e50914; margin-bottom: 15px;" th:text="${error}"></div>
+
     <form th:action="@{/login}" method="post">
         <div class="form-group">
             <input type="text" id="username" name="username" placeholder="Usuario o email" required>

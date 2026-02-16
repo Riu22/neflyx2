@@ -49,6 +49,14 @@ public class country {
         this.movies = movies;
     }
 
+    public String getMainInfo() {
+        return country_name;
+    }
+
+    public String getSecondaryInfo() {
+        return country_iso_code;
+    }
+
     @PreRemove
     private void removeCountriesFromMovies() {
         if (movies != null) {

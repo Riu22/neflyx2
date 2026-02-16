@@ -34,6 +34,13 @@ public class language_role {
     public List<movie_languages> getMovie_languages_rol() {
         return movie_languages_rol;
     }
+    public String getMainInfo() {
+        return language_role;
+    }
+
+    public String getSecondaryInfo() {
+        return (movie_languages_rol != null) ? movie_languages_rol.size() + " usos" : "0 usos";
+    }
 
     public void setMovie_languages_rol(List<movie_languages> movie_languages_rol) {
         this.movie_languages_rol = movie_languages_rol;

@@ -39,6 +39,14 @@ public class genre {
     @ManyToMany(mappedBy = "genres")
     List<movie> movies;
 
+    public String getMainInfo() {
+        return genre_name;
+    }
+
+    public String getSecondaryInfo() {
+        return (movies != null) ? movies.size() + " películas" : "0 películas";
+    }
+
     @PreRemove
     private void remove() {
         if (movies != null) {

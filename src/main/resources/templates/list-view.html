@@ -2,188 +2,214 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Administración - Neflyx2</title>
+    <title>Lista - Neflyx2</title>
     <style>
         :root {
             --primary: #e50914;
             --bg: #141414;
             --surface: #1f1f1f;
             --text: #ffffff;
-            --text-dim: #b3b3b3;
-            --border: #333333;
+            --border: #333;
         }
 
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding: 30px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h2 { border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 20px; }
+
+        .btn-primary {
+            background: var(--primary); color: white; border: none;
+            padding: 10px 18px; font-weight: bold; cursor: pointer;
+            border-radius: 4px; text-decoration: none; font-size: 13px;
+            display: inline-block; transition: 0.3s;
+        }
+        .btn-primary:hover { opacity: 0.8; }
+
+        /* ========== BUSCADOR ========== */
+        .search-bar {
+            display: flex; gap: 10px; margin-bottom: 20px;
+            background: var(--surface); padding: 15px;
+            border-radius: 8px; border: 1px solid var(--primary);
+        }
+        .search-bar input {
+            flex: 1; background: #2a2a2a; border: 1px solid var(--border);
+            color: white; padding: 10px 14px; border-radius: 6px; font-size: 14px;
+        }
+        .search-bar button {
+            background: var(--primary); color: white; border: none;
+            padding: 10px 18px; border-radius: 6px; cursor: pointer;
+            font-weight: bold; font-size: 14px;
         }
 
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
+        /* ========== TABLA ========== */
+        .table-wrap {
+            background: var(--surface); border-radius: 8px;
+            overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 15px;
-        }
-
-        h2 { text-transform: uppercase; letter-spacing: 1px; }
-
-        .btn {
-            padding: 10px 20px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 14px;
-            transition: 0.3s;
-            display: inline-block;
-        }
-
-        .btn-add { background-color: var(--primary); color: white; }
-        .btn-back { background-color: #444; color: white; margin-right: 10px; }
-        .btn:hover { opacity: 0.8; transform: translateY(-1px); }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: var(--surface);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
+        table { width: 100%; border-collapse: collapse; }
         th {
-            background-color: #2a2a2a;
-            color: var(--text-dim);
-            text-align: left;
-            padding: 15px;
-            font-size: 13px;
-            text-transform: uppercase;
+            background: #111; color: #888; font-size: 12px;
+            letter-spacing: 1px; text-transform: uppercase;
+            padding: 12px 15px; text-align: left;
         }
+        td { padding: 12px 15px; border-bottom: 1px solid #222; font-size: 14px; }
+        tr:hover td { background: #252525; }
 
-        td {
-            padding: 15px;
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
+        .td-actions { display: flex; gap: 8px; }
+        .btn-edit {
+            background: #1a3a5c; color: #6ab4ff; border: 1px solid #2a5a8c;
+            padding: 5px 12px; border-radius: 4px; font-size: 12px;
+            font-weight: bold; text-decoration: none;
         }
-
-        tr:hover { background-color: #252525; }
-
-        .badge {
-            background: #333;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            color: var(--text-dim);
+        .btn-delete {
+            background: #3a1a1a; color: #ff8080; border: 1px solid #6a2a2a;
+            padding: 5px 12px; border-radius: 4px; font-size: 12px;
+            font-weight: bold; text-decoration: none; cursor: pointer;
         }
-
-        .actions a {
-            text-decoration: none;
-            font-size: 18px;
-            margin-right: 15px;
-            display: inline-block;
-        }
-
-        .edit-link { color: #007bff; }
-        .delete-link { color: var(--primary); }
 
         .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-top: 30px;
+            display: flex; align-items: center; gap: 10px;
+            margin-top: 20px; justify-content: center;
         }
-
-        .pagination a, .pagination span {
-            padding: 8px 12px;
-            background: var(--surface);
-            border-radius: 4px;
-            text-decoration: none;
-            color: var(--text);
-        }
-
-        .pagination a:hover {
-            background: var(--primary);
-        }
-
-        .pagination .current {
-            background: var(--primary);
-            font-weight: bold;
-        }
+        .pagination a { background: #333; padding: 8px 14px; border-radius: 4px; text-decoration: none; color: white; }
+        .pagination .current { background: var(--primary); padding: 8px 14px; border-radius: 4px; font-weight: bold; }
+        .no-results { text-align: center; padding: 40px; color: #888; }
     </style>
 </head>
 <body>
-
 <div class="container">
-    <div class="header">
-        <h2 th:text="'Gestión de ' + ${entityName}">Entidad</h2>
-        <div>
-            <a href="/admin/dashboard" class="btn btn-back">⬅ Volver</a>
-            <a th:href="@{/admin/edit/{e}/0(e=${entityName})}" class="btn btn-add">+ Añadir Registro</a>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>📋 <span th:text="${entityName}"></span></h2>
+        <div style="display: flex; gap: 10px;">
+            <a th:href="@{/admin/edit/{entity}(entity=${entityName}, id='0', movieId=${movieId})}" class="btn-primary">
+                ➕ Nuevo
+            </a>
+            <a th:href="@{/admin/dashboard}" class="btn-primary" style="background: #444;">
+                ← Volver
+            </a>
         </div>
     </div>
 
-    <table>
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Información Principal</th>
-            <th>Atributos / Relación</th>
-            <th style="text-align: center;">Acciones</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="obj : ${items}">
-            <td>
-                <span class="badge" th:text="${obj.id}">ID</span>
-            </td>
+    <div th:if="${entityName == 'movie'}" class="search-bar">
+        <input type="text" id="quickSearch" placeholder="🔍 Busca por título..." onkeyup="handleQuickSearch(event)">
+        <button onclick="doQuickSearch()">Buscar</button>
+        <button onclick="clearSearch()" style="background: #444;">✕ Limpiar</button>
+    </div>
 
-            <td>
-                <strong th:text="${obj.mainInfo}">Información</strong>
-            </td>
+    <div id="quickSearchResults" style="display: none;">
+        <div class="table-wrap" style="margin-bottom: 20px;">
+            <table>
+                <thead><tr><th>ID</th><th>Título</th><th>Año</th><th>Acciones</th></tr></thead>
+                <tbody id="quickSearchBody"></tbody>
+            </table>
+        </div>
+    </div>
 
-            <td>
-                <span th:text="${obj.secondaryInfo}">Atributos</span>
-            </td>
+    <div id="normalList">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Info</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(items)}">
+                    <td colspan="4" class="no-results">No hay registros</td>
+                </tr>
+                <tr th:each="item : ${items}">
+                    <td th:text="${item.id}" style="color: #888; font-size: 12px;"></td>
+                    <td th:text="${item.mainInfo}" style="font-weight: 600;"></td>
+                    <td th:text="${item.secondaryInfo}" style="color: #888; font-size: 12px;"></td>
+                    <td>
+                        <div class="td-actions">
+                            <a th:href="@{/admin/edit/{entity}(entity=${entityName}, id=${item.id}, movieId=${movieId})}"
+                               class="btn-edit">✏️ Editar</a>
 
-            <td class="actions" style="text-align: center;">
-                <a th:href="@{/admin/edit/{e}/{id}(e=${entityName}, id=${obj.id})}"
-                   class="edit-link" title="Editar">✏️</a>
+                            <a th:href="@{/admin/delete/{entity}(entity=${entityName}, id=${item.id}, movieId=${movieId})}"
+                               class="btn-delete"
+                               onclick="return confirm('¿Eliminar este registro?')">🗑️ Borrar</a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
 
-                <a th:href="@{/admin/delete/{e}/{id}(e=${entityName}, id=${obj.id})}"
-                   class="delete-link" title="Borrar"
-                   onclick="return confirm('¿Eliminar este registro?')">🗑️</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
-    <div class="pagination" th:if="${totalPages > 1}">
-        <a th:if="${currentPage > 0}"
-           th:href="@{/admin/list/{e}(e=${entityName}, page=${currentPage - 1})}">
-            ← Anterior
-        </a>
-
-        <span th:if="${currentPage == 0}" style="opacity: 0.5;">← Anterior</span>
-
-        <span class="current" th:text="'Página ' + ${currentPage + 1} + ' de ' + ${totalPages}"></span>
-
-        <a th:if="${currentPage + 1 < totalPages}"
-           th:href="@{/admin/list/{e}(e=${entityName}, page=${currentPage + 1})}">
-            Siguiente →
-        </a>
-
-        <span th:if="${currentPage + 1 >= totalPages}" style="opacity: 0.5;">Siguiente →</span>
+        <div class="pagination" th:if="${totalPages > 1}">
+            <a th:if="${currentPage > 0}" th:href="@{/admin/list/{entity}(entity=${entityName}, page=${currentPage - 1}, movieId=${movieId})}">← Anterior</a>
+            <span class="current" th:text="'Página ' + (${currentPage + 1}) + ' de ' + ${totalPages}"></span>
+            <a th:if="${currentPage + 1 < totalPages}" th:href="@{/admin/list/{entity}(entity=${entityName}, page=${currentPage + 1}, movieId=${movieId})}">Siguiente →</a>
+        </div>
     </div>
 </div>
 
+<script>
+    let searchTimeout = null;
+
+    function handleQuickSearch(event) {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const val = document.getElementById('quickSearch').value.trim();
+            if (val.length >= 2) doQuickSearch();
+            else clearSearch();
+        }, 400);
+    }
+
+    async function doQuickSearch() {
+        const keyword = document.getElementById('quickSearch').value.trim();
+        if (!keyword || keyword.length < 2) return;
+
+        try {
+            const response = await fetch(`/movies/search?keyword=${encodeURIComponent(keyword)}&size=20&page=0`);
+            const data = await response.json();
+            const movies = data.content;
+
+            const tbody    = document.getElementById('quickSearchBody');
+            const results  = document.getElementById('quickSearchResults');
+            const normal   = document.getElementById('normalList');
+
+            if (!movies || movies.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="no-results">😔 No se encontraron películas</td></tr>`;
+            } else {
+                tbody.innerHTML = movies.map(movie => {
+                    const year = movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : 'N/A';
+                    return `
+                        <tr>
+                            <td style="color:#888; font-size:12px;">${movie.movieId}</td>
+                            <td style="font-weight:600;">${escapeHtml(movie.title)}</td>
+                            <td style="color:#888; font-size:12px;">${year}</td>
+                            <td>
+                                <div class="td-actions">
+                                    <a href="/admin/edit/movie?id=${movie.movieId}" class="btn-edit">✏️ Editar</a>
+                                    <a href="/admin/delete/movie?id=${movie.movieId}" class="btn-delete"
+                                       onclick="return confirm('¿Eliminar esta película?')">🗑️ Borrar</a>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+            results.style.display = 'block';
+            normal.style.display  = 'none';
+        } catch (error) { console.error('Error:', error); }
+    }
+
+    function clearSearch() {
+        document.getElementById('quickSearch').value = '';
+        document.getElementById('quickSearchResults').style.display = 'none';
+        document.getElementById('normalList').style.display = 'block';
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+</script>
 </body>
 </html>

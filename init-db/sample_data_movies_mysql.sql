@@ -228,16 +228,19 @@ UNLOCK TABLES;
 --
 -- Table structure for table `movie_cast`
 --
-
 DROP TABLE IF EXISTS `movie_cast`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `movie_cast` (
-  `movie_id` int(10) DEFAULT NULL,
-  `person_id` int(10) DEFAULT NULL,
-  `character_name` varchar(400) DEFAULT NULL,
-  `gender_id` int(10) DEFAULT NULL,
-  `cast_order` int(5) DEFAULT NULL,
+  `movie_id` int(10) NOT NULL,            -- Cambiado a NOT NULL para la PK
+  `person_id` int(10) NOT NULL,           -- Cambiado a NOT NULL para la PK
+  `character_name` varchar(400) NOT NULL, -- Cambiado a NOT NULL para la PK
+  `gender_id` int(10) NOT NULL DEFAULT 0, -- Cambiado a NOT NULL para la PK
+  `cast_order` int(11) DEFAULT NULL,
+
+  -- Definición de la Llave Primaria compuesta de 4 campos
+  PRIMARY KEY (`movie_id`, `person_id`, `gender_id`, `character_name`),
+
   KEY `fk_mca_movie` (`movie_id`),
   KEY `fk_mca_per` (`person_id`),
   KEY `fk_mca_gender` (`gender_id`),
@@ -246,7 +249,6 @@ CREATE TABLE `movie_cast` (
   CONSTRAINT `fk_mca_per` FOREIGN KEY (`person_id`) REFERENCES `person` (`person_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
 --
 -- Dumping data for table `movie_cast`
 --
@@ -292,13 +294,12 @@ UNLOCK TABLES;
 --
 
 DROP TABLE IF EXISTS `movie_crew`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `movie_crew` (
-  `movie_id` int(10) DEFAULT NULL,
-  `person_id` int(10) DEFAULT NULL,
-  `department_id` int(10) DEFAULT NULL,
-  `job` varchar(200) DEFAULT NULL,
+  `movie_id` int(10) NOT NULL,
+  `person_id` int(10) NOT NULL,
+  `department_id` int(10) NOT NULL,
+  `job` varchar(200) NOT NULL,
+  PRIMARY KEY (`movie_id`, `person_id`, `department_id`, `job`), -- Llave de 4 campos
   KEY `fk_mcr_movie` (`movie_id`),
   KEY `fk_mcr_per` (`person_id`),
   KEY `fk_mcr_dept` (`department_id`),
@@ -306,8 +307,6 @@ CREATE TABLE `movie_crew` (
   CONSTRAINT `fk_mcr_movie` FOREIGN KEY (`movie_id`) REFERENCES `movie` (`movie_id`),
   CONSTRAINT `fk_mcr_per` FOREIGN KEY (`person_id`) REFERENCES `person` (`person_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
 --
 -- Dumping data for table `movie_crew`
 --

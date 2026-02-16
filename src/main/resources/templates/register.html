@@ -111,6 +111,7 @@
 
 <div class="register-container">
     <h1>Crear cuenta</h1>
+    <div th:if="${error}" style="color: #e50914; margin-bottom: 15px;" th:text="${error}"></div>
 
     <form th:action="@{/register}" method="post">
         <div class="form-group">

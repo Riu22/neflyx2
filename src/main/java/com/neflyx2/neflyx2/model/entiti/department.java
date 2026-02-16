@@ -28,8 +28,14 @@ public class department {
     public void setDepartment_name(String department_name) {
         this.department_name = department_name;
     }
+    public String getMainInfo() {
+        return department_name;
+    }
 
-    // Getters y Setters para la nueva lista
+    public String getSecondaryInfo() {
+        return (crewMembers != null) ? crewMembers.size() + " miembros" : "0 miembros";
+    }
+
     public java.util.List<movie_crew> getCrewMembers() {
         return crewMembers;
     }
@@ -38,4 +44,3 @@ public class department {
         this.crewMembers = crewMembers;
     }
 }
-    

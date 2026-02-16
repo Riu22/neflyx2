@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -43,7 +44,6 @@ public class movie_controller {
             @RequestParam(required = false) String character,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "24") int size) {
-//prueba
         return movie_service.get_filtered_movies(
                 keyword,
                 year,
@@ -66,5 +66,11 @@ public class movie_controller {
         } else {
             return "redirect:/movies?error=notfound";
         }
+    }
+
+    @GetMapping("/movies/autocomplete")
+    @ResponseBody
+    public List<String> autocomplete(@RequestParam(required = false) String type, @RequestParam String term) {
+        return detail_service.getAutocompleteSuggestions(term);
     }
 }

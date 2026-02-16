@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>MovieFlix - Buscador de Películas</title>
+    <title>Neflyx2 - Buscador Inteligente</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -11,7 +11,6 @@
     <div class="navbar-brand">NEFLYX2</div>
     <div class="navbar-links">
         <a th:if="${session.username == null}" href="/neflyx2/login">Iniciar sesión</a>
-
         <div th:if="${session.username != null}" class="user-info">
             <span th:text="'Hola, ' + ${session.username}"></span>
             <a href="/logout" style="margin-left: 15px;">Cerrar sesión</a>
@@ -21,25 +20,26 @@
 
 <div class="container">
     <div class="filters-section">
-        <div class="filters-title">Buscar</div>
+        <div class="filters-title">Explorar Catálogo</div>
         <div class="filter-grid">
-            <input type="text" id="keyword" class="filter-input" placeholder="Título">
-            <input type="number" id="year" class="filter-input" placeholder="Año" min="1900" max="2030">
+            <input type="text" id="keyword" class="filter-input" placeholder="Título de película..." list="suggestions-list">
+
+            <input type="number" id="year" class="filter-input" placeholder="Año" min="1900" max="2026">
+
             <select id="genre" class="filter-select">
-                <option value="">Géneros</option>
-                <option th:each="g : ${genres_list}"
-                        th:value="${g.genre_name}"
-                        th:text="${g.genre_name}">
-                </option>
+                <option value="">Todos los géneros</option>
+                <option th:each="g : ${genres_list}" th:value="${g.genre_name}" th:text="${g.genre_name}"></option>
             </select>
-            <input type="text" id="director" class="filter-input" placeholder="Director">
-            <input type="text" id="actor" class="filter-input" placeholder="Actor">
-            <input type="text" id="character" class="filter-input" placeholder="Personaje (ej: Jack Sparrow)">
+
+            <input type="text" id="director" class="filter-input" placeholder="Director" list="suggestions-list">
+            <input type="text" id="actor" class="filter-input" placeholder="Actor" list="suggestions-list">
+            <input type="text" id="character" class="filter-input" placeholder="Personaje">
         </div>
 
-        <div class="button-group" style="display: flex; gap: 10px; margin-top: 15px;">
-            <button class="btn-search" onclick="searchMovies()" style="flex: 1;">Buscar</button>
+        <datalist id="suggestions-list"></datalist>
 
+        <div class="button-group" style="display: flex; gap: 10px; margin-top: 15px;">
+            <button class="btn-search" onclick="searchMovies(0)" style="flex: 2;">Buscar Películas</button>
             <a th:if="${session.username != null}"
                href="/admin/dashboard"
                class="btn-search"
@@ -49,26 +49,27 @@
         </div>
     </div>
 
-    <div class="loading" id="loading">
+    <div class="loading" id="loading" style="display: none;">
         <div class="loading-spinner"></div>
-        Cargando películas...
+        Buscando en la base de datos...
     </div>
 
     <div id="resultsSection" style="display: none;">
-        <h2 class="section-title" id="sectionTitle">Resultados de búsqueda</h2>
+        <h2 class="section-title" id="sectionTitle">Resultados</h2>
         <div class="movie-grid" id="movieGrid"></div>
     </div>
 
     <div id="welcomeMessage">
         <div class="no-results">
             <div class="no-results-icon">🎬</div>
-            <p>Miles de películas te esperan. ¿Qué quieres ver hoy?</p>
+            <p>Escribe el nombre de una película, actor o director para comenzar.</p>
         </div>
     </div>
 
     <div class="pagination" id="pagination" style="display: none;"></div>
 </div>
-<script src="index.js"></script>
 
+<script src="index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/autoComplete.min.js"></script>
 </body>
 </html>

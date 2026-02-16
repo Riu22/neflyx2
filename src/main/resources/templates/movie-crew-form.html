@@ -70,58 +70,42 @@
     </style>
 </head>
 <body>
-
 <div class="container">
-    <h2>Asignar Personal Técnico</h2>
+    <h2 th:text="${item.movie != null ? 'Equipo de: ' + item.movie.title : 'Asignar Personal'}"></h2>
 
-    <form th:action="@{/admin/movie_crew/save}" th:object="${item}" method="post">
-
-        <!-- Si tienes un ID para edición, inclúyelo como hidden -->
-        <input type="hidden" th:field="*{id}" th:if="${item.id != null}">
+    <form th:action="@{/admin/save/movie_crew}" th:object="${item}" method="post">
+        <input type="hidden" name="movieId" th:value="${movieId}">
 
         <div class="form-group">
             <label>Película:</label>
-            <select th:field="*{movie}" class="filter-select" required>
-                <option value="">Selecciona una película...</option>
-                <option th:each="m : ${movies}"
-                        th:value="${m.movie_id}"
-                        th:text="${m.title}"
-                        th:selected="${item.movie != null && item.movie.movie_id == m.movie_id}">
-                </option>
+            <select th:field="*{movie.movie_id}" class="filter-select" required>
+                <option th:each="m : ${movies}" th:value="${m.movie_id}" th:text="${m.title}"></option>
             </select>
         </div>
 
         <div class="form-group">
             <label>Trabajador (Persona):</label>
-            <select th:field="*{person}" class="filter-select" required>
+            <select th:field="*{person.person_id}" class="filter-select" required>
                 <option value="">Selecciona una persona...</option>
-                <option th:each="p : ${persons}"
-                        th:value="${p.person_id}"
-                        th:text="${p.person_name}"
-                        th:selected="${item.person != null && item.person.person_id == p.person_id}">
-                </option>
+                <option th:each="p : ${persons}" th:value="${p.person_id}" th:text="${p.person_name}"></option>
             </select>
         </div>
 
         <div class="form-group">
             <label>Departamento:</label>
-            <select th:field="*{department}" class="filter-select" required>
-                <option value="">Selecciona departamento (Directing, Art, etc.)</option>
-                <option th:each="d : ${departments}"
-                        th:value="${d.department_id}"
-                        th:text="${d.department_name}"
-                        th:selected="${item.department != null && item.department.department_id == d.department_id}">
-                </option>
+            <select th:field="*{department.department_id}" class="filter-select" required>
+                <option th:each="d : ${departments}" th:value="${d.department_id}" th:text="${d.department_name}"></option>
             </select>
         </div>
 
         <div class="form-group">
             <label>Trabajo específico (Job):</label>
-            <input type="text" th:field="*{job}" class="filter-input" placeholder="Ej: Director, Executive Producer, Editor..." required>
+            <input type="text" th:field="*{job}" class="filter-input" required>
         </div>
 
         <button type="submit" class="btn-save">💾 Guardar en el Crew</button>
-        <a href="/admin/list/movie_crew" class="btn-cancel">Cancelar y volver</a>
+        <a th:href="@{'/admin/list/movie_crew' + (${movieId != null} ? '?movieId=' + ${movieId} : '')}"
+           class="btn-cancel">Cancelar y volver</a>
     </form>
 </div>
 
